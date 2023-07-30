@@ -30,9 +30,6 @@
     <ClCompile Include="src\GameObject\CMath.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObject\Dot.cpp">
-      <Filter>Source Files\GameObjects</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameObject\MouseButton.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
@@ -93,9 +90,6 @@
       <Filter>Source Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="src\GameObject\Define.h">
-      <Filter>Source Files\GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GameObject\Dot.h">
       <Filter>Source Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="src\GameObject\MouseButton.h">

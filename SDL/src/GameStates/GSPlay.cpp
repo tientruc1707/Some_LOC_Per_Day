@@ -19,7 +19,7 @@ GSPlay::~GSPlay()
 void GSPlay::Init()
 {
 	//auto model = ResourceManagers::GetInstance()->GetModel("Sprite2D.nfg");
-	auto texture = ResourceManagers::GetInstance()->GetTexture("bg_play1.tga");
+	auto texture = ResourceManagers::GetInstance()->GetTexture("bgr_game.png");
 
 	// background
 	
@@ -28,7 +28,7 @@ void GSPlay::Init()
 	m_background->Set2DPosition(0, 0);
 
 	// button close
-	texture = ResourceManagers::GetInstance()->GetTexture("btn_close.tga");
+	texture = ResourceManagers::GetInstance()->GetTexture("Next_Button.png");
 	button = std::make_shared<MouseButton>( texture, SDL_FLIP_NONE);
 	button->SetSize(50, 50);
 	button->Set2DPosition(SCREEN_WIDTH - 50, 10);
@@ -38,8 +38,8 @@ void GSPlay::Init()
 	m_listButton.push_back(button);
 
    // Animation 
-	texture = ResourceManagers::GetInstance()->GetTexture("Actor1_2.tga");
-	obj = std::make_shared<SpriteAnimation>( texture, 2, 9, 6, 0.2f);
+	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
+	obj = std::make_shared<SpriteAnimation>( texture, 1,2,8, 0.5f);
 	obj->SetFlip(SDL_FLIP_HORIZONTAL);
 	obj->SetSize(40, 50);
 	obj->Set2DPosition(240, 400);
