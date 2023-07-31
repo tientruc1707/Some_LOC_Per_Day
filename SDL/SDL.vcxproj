@@ -166,9 +166,13 @@
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameManager\ResourceManagers.cpp" />
+    <ClCompile Include="src\GameObject\Bullet.cpp" />
     <ClCompile Include="src\GameObject\Camera.cpp" />
     <ClCompile Include="src\GameObject\CMath.cpp" />
+    <ClCompile Include="src\GameObject\Enemy.cpp" />
+    <ClCompile Include="src\GameObject\Gun.cpp" />
     <ClCompile Include="src\GameObject\MouseButton.cpp" />
+    <ClCompile Include="src\GameObject\Player.cpp" />
     <ClCompile Include="src\GameObject\Renderer.cpp" />
     <ClCompile Include="src\GameObject\Sound.cpp" />
     <ClCompile Include="src\GameObject\Sprite2D.cpp" />
@@ -188,10 +192,14 @@
     <ClInclude Include="src\GameManager\ResourceManagers.h" />
     <ClInclude Include="src\GameManager\Singleton.h" />
     <ClInclude Include="src\GameObject\BaseObject.h" />
+    <ClInclude Include="src\GameObject\Bullet.h" />
     <ClInclude Include="src\GameObject\Camera.h" />
     <ClInclude Include="src\GameObject\CMath.h" />
     <ClInclude Include="src\GameObject\Define.h" />
+    <ClInclude Include="src\GameObject\Enemy.h" />
+    <ClInclude Include="src\GameObject\Gun.h" />
     <ClInclude Include="src\GameObject\MouseButton.h" />
+    <ClInclude Include="src\GameObject\Player.h" />
     <ClInclude Include="src\GameObject\Renderer.h" />
     <ClInclude Include="src\GameObject\Sound.h" />
     <ClInclude Include="src\GameObject\Sprite2D.h" />
