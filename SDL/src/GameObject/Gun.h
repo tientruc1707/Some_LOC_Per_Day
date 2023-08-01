@@ -17,8 +17,12 @@ public:
 	int GetHeight();
 	void SetRotation(double angle);
 	void SetFlip(SDL_RendererFlip flip);
+
+	bool GetPicked();
+	void SetPicked(bool picked);
 protected:
 	int m_iWidth;
 	int m_iHeight;
 	SDL_RendererFlip m_flip;
+	bool isPicked;
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseObject.h"
 
-class Bullet : BaseObject
+class Bullet : public BaseObject
 {
 protected:
 	int m_iWidth;
@@ -12,16 +12,18 @@ protected:
 public:
 	Bullet() : BaseObject(), m_iWidth(0), m_iHeight(0) {}
 	Bullet(std::shared_ptr<TextureManager> texture, SDL_RendererFlip flip);
+
 	void Init() override;
 	void Draw(SDL_Renderer* renderer) override;
-
 	void Update(float deltatime) override;
+
 	void Set2DPosition(float x, float y);
 	Vector3		Get2DPosition();
 	void SetSize(int width, int height);
 	int GetWidth();
 	int GetHeight();
 	void SetRotation(double angle);
+	float GetRotation();
 	void SetFlip(SDL_RendererFlip flip);
 
 	void SetActive(bool Active);

@@ -28,7 +28,10 @@ public:
 	void	HandleMouseMoveEvents(int x, int y) override;
 	void	Update(float deltaTime) override;
 	void	Draw(SDL_Renderer* renderer) override;
-	void MovePlayer(float dx, float dy);
+	void	MovePlayer(float dx, float dy);
+
+	void EnemyAutoMove(std::shared_ptr<Enemy> e);
+
 	int m_KeyPress;
 
 private:
@@ -42,7 +45,7 @@ private:
 	std::shared_ptr<Enemy> m_enemy;
 	std::list<std::shared_ptr<Enemy>> m_listEnemy;
 	//Gun
-	std::shared_ptr<Gun> m_gun1, m_gun2, m_gun3;
+	std::shared_ptr<Gun> m_gun1, m_gun2, m_gun3, m_selectedGun;
 	std::list<std::shared_ptr<Gun>> m_listGun;
 	//Bullet
 	std::shared_ptr<Bullet> m_bullet;
@@ -54,5 +57,7 @@ private:
 	float m_shootDelay = 20;
 	float m_lastShoot = 0.0;
 	float gunAngle = 0.0;
+
+	int playerDirection = 1;
 };
 

@@ -1,4 +1,4 @@
-#include "GSPlay.h"
+﻿#include "GSPlay.h"
 #include "GameObject/TextureManager.h"
 #include "GameObject/Sprite2D.h"
 #include "GameObject/MouseButton.h"
@@ -8,6 +8,11 @@
 //check VAR
 bool checkVAR(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
 	return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+
+// tính khoảng cách giữa hai điểm
+float distance(float x1, float y1, float x2, float y2) {
+	return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 GSPlay::GSPlay()
@@ -37,7 +42,7 @@ void GSPlay::Init()
 	button->SetSize(50, 50);
 	button->Set2DPosition(SCREEN_WIDTH - 50, 10);
 	button->SetOnClick([this]() {
-		GameStateMachine::GetInstance()->PopState();
+		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_MENU);
 		});
 	m_listButton.push_back(button);
 
@@ -49,30 +54,49 @@ void GSPlay::Init()
 	m_player->Set2DPosition(240, 400);
 	m_listAnimation.push_back(m_player);
 
+	for (int i = 0; i < MAX_ENEMY; ++i)
+	{
+		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 1,8,3, 0.1f);
+		/*m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy2.tga"), 1, 1, 7, 0.5f);
+		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy3.tga"), 1, 1, 7, 0.5f);
+		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy4.tga"), 1, 1, 7, 0.5f);*/
+		m_enemy->SetFlip(SDL_FLIP_NONE);
+		m_enemy->SetSize(100, 100);
+		m_enemy->Set2DPosition(rand() % SCREEN_WIDTH,
+			rand() % SCREEN_HEIGHT);
+		m_enemy->SetEnemyAlive(true);
+		m_listEnemy.push_back(m_enemy);
+	}
 	//Bullet
 	for (int i = 0; i < 20; ++i)
 	{
-		m_bullet = std::make_shared<Bullet>(ResourceManagers::GetInstance()->GetTexture("bullet.png"));
+		m_bullet = std::make_shared<Bullet>(ResourceManagers::GetInstance()->GetTexture("bullet.png"), SDL_FLIP_NONE);
 		m_bullet->SetSize(10, 10);
 		m_bullet->SetActive(false);
 		m_listBullet.push_back(m_bullet);
 	}
 	//Gun
 		//piston
-		m_gun2 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR2.png"));
+		m_gun2 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR2.png"),SDL_FLIP_NONE);
 		m_gun2->SetSize(20, 20);
+		m_gun2->SetPicked(true);
 		m_listGun.push_back(m_gun2);
+	
 		//M249
-		m_gun1 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"));
+		m_gun1 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"),SDL_FLIP_NONE);
 		m_gun1->SetSize(30, 20);
+		m_gun1->SetPicked(false);
+		m_gun1->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
 		m_listGun.push_back(m_gun1);
+
 		//Soc Lo
-		m_gun3 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"));
+		m_gun3 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"),SDL_FLIP_NONE);
 		m_gun3->SetSize(40, 20);
+		m_gun3->SetPicked(false);
+		m_gun3->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
 		m_listGun.push_back(m_gun3);
 
-	//Camera::GetInstance()->SetTarget(obj);
-	m_listAnimation.push_back(m_player);
+	Camera::GetInstance()->SetTarget(m_player);
 
 	m_KeyPress = 0;
 }
@@ -167,12 +191,14 @@ void GSPlay::HandleKeyEvents(SDL_Event& e)
 				if (!it->GetActive()) //if bullet doesn't active
 				{
 					if (curentTime - m_lastShoot > m_shootDelay) {
-						for (auto& weapon : m_listGun) { //each gun of listgun
-							it->Set2DPosition(weapon->Get2DPosition().x + weapon->GetWidth() / 2,
-								weapon->Get2DPosition().y + weapon->GetHeight() / 2);
-							it->SetRotation(gunAngle);
-							it->SetActive(true);
-							m_lastShoot = curentTime;
+						for (auto& gun : m_listGun) {
+							if (gun->GetPicked()) {//each gun of listgun
+								it->Set2DPosition(gun->Get2DPosition().x + gun->GetWidth() / 2,
+									gun->Get2DPosition().y + gun->GetHeight() / 2);
+								it->SetRotation(gunAngle);
+								it->SetActive(true);
+								m_lastShoot = curentTime;
+							}
 						}
 					}
 				}
@@ -184,7 +210,7 @@ void GSPlay::HandleKeyEvents(SDL_Event& e)
 
 void GSPlay::HandleTouchEvents(SDL_Event& e, bool bIsPressed)
 {
-	for (auto button : m_listButton)
+	for (auto& button : m_listButton)
 	{
 		if (button->HandleTouchEvent(&e))
 		{
@@ -200,39 +226,149 @@ float time1 = 0.0f;
 
 void GSPlay::Update(float deltaTime)
 {
-	switch (m_KeyPress)//Handle Key event
+	//Handle KeyEvent
+	switch (m_KeyPress)
 	{
 	default:
 		break;
 	}
 	
+	//Update Button
 	for (auto& it : m_listButton)
 	{
 		it->Update(deltaTime);
 	}
+
+	//Update Player
 	for (auto& it : m_listAnimation)
 	{
-		
-	}
-	//Spawn Enenmy 
-	time1 += deltaTime;
-	if (time1 >= 1.5f)
-	{
-		for (int i = 0; i < MAX_ENEMY; ++i)
+		//Move player
+		switch (m_KeyPress)
 		{
-			m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1.tga"), 1, 1, 7, 0.5f);
-			m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy2.tga"), 1, 1, 7, 0.5f);
-			m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy3.tga"), 1, 1, 7, 0.5f);
-			m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy4.tga"), 1, 1, 7, 0.5f);
-
-			m_enemy->SetSize(30, 45);
-			m_enemy->Set2DPosition(rand() % 0 + (-10) || rand() % (SCREEN_WIDTH + 10) + SCREEN_WIDTH,
-									rand() % 0 + (-10) || (SCREEN_HEIGHT + 10) + SCREEN_HEIGHT);
-			m_enemy->SetEnemyAlive(true);
-			m_listEnemy.push_back(m_enemy);
+		case 1: // Move left
+			MovePlayer(-deltaTime, 0);
+			break;
+		case 2: // Move down
+			MovePlayer(0, deltaTime);
+			break;
+		case 4: // Move right
+			MovePlayer(deltaTime, 0);
+			break;
+		case 8: // Move up
+			MovePlayer(0, -deltaTime);
+			break;
+		default:
+			break;
 		}
-		time1 += 0.0f;
+		it->Update(deltaTime);
 	}
+
+	//Update Enemy
+	for (auto& it : m_listEnemy)
+	{
+		GSPlay::EnemyAutoMove(it);
+		// Get the enemy position and size
+		float ex = it->Get2DPosition().x;
+		float ey = it->Get2DPosition().y;
+		float ew = it->GetWidth();
+		float eh = it->GetHeight();
+
+		if (it->GetEnemyAlive()) //if enemy alive
+		{
+			//collision with bullet
+			for (auto& bul : m_listBullet)
+			{
+				float xb = bul->Get2DPosition().x;
+				float yb = bul->Get2DPosition().y;
+				float wb = bul->GetWidth();
+				float hb = bul->GetHeight();
+				//check VAR
+				if (checkVAR(xb, yb, wb, hb, ex, ey, ew, eh))
+				{
+					bul->SetActive(false);
+					it->SetEnemyAlive(false);
+					break;
+				}
+			}
+		}
+		it->Update(deltaTime);
+	}
+
+	//Spawn Enenmy 
+	//time1 += deltaTime;
+	//if (time1 >= 1.5f)
+	//{
+	//	for (int i = 0; i < MAX_ENEMY; ++i)
+	//	{
+	//		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 1, 8, 3, 0.5f);
+	//		/*m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy2.tga"), 1, 1, 7, 0.5f);
+	//		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy3.tga"), 1, 1, 7, 0.5f);
+	//		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy4.tga"), 1, 1, 7, 0.5f);*/
+
+	//		m_enemy->SetFlip(SDL_FLIP_NONE);
+	//		m_enemy->SetSize(30, 45);
+	//		m_enemy->Set2DPosition(rand() % SCREEN_WIDTH,
+	//								rand() %  SCREEN_HEIGHT);
+	//		m_enemy->SetEnemyAlive(true);
+	//		m_listEnemy.push_back(m_enemy);
+	//	}
+	//	time1 += 0.0f;
+	//}
+
+	//Update Gun
+	for (auto& it : m_listGun)
+	{
+		float x = m_player->Get2DPosition().x,
+			y = m_player->Get2DPosition().y,
+			w = m_player->GetWidth(),
+			h = m_player->GetHeight();
+		//Hand Posision
+		double handX = x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
+		double handY = y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
+		//Pick Gun
+		if (checkVAR(x, y, w, h, m_gun1->Get2DPosition().x, m_gun1->Get2DPosition().y, m_gun1->GetWidth(), m_gun1->GetHeight()))
+		{
+			m_gun1->SetPicked(true);
+			m_gun2->SetPicked(false);
+			m_gun3->SetPicked(false);
+		}
+		if (checkVAR(x, y, w, h, m_gun2->Get2DPosition().x, m_gun2->Get2DPosition().y, m_gun2->GetWidth(), m_gun2->GetHeight()))
+		{
+			m_gun1->SetPicked(false);
+			m_gun2->SetPicked(false);
+			m_gun3->SetPicked(true);
+		}
+		//Pick gun done
+		if (it->GetPicked()) {
+			it->SetRotation(gunAngle);
+			//Set Gun on Hand
+			it->Set2DPosition(handX - it->GetWidth() / 2, handY - it->GetHeight() / 2);
+		}
+	}
+
+	//Update BUllet
+	for (auto& it : m_listBullet) {
+		
+		if (it->GetActive())
+		{
+			float x = it->Get2DPosition().x;
+			float y = it->Get2DPosition().y;
+			float r = it->GetRotation();
+			x += 20 * cos(r * M_PI / 180);
+			y += 20 * sin(r * M_PI / 180);
+
+			// Set the new bullet position
+			it->Set2DPosition(x, y);
+
+			// Collision with screen
+			if (x < 0 || x > SCREEN_WIDTH || y < 0 || y > SCREEN_HEIGHT)
+			{
+				it->SetActive(false);
+			}
+		}
+		it->Update(deltaTime);
+	}
+
 	//Update position of camera
 	Camera::GetInstance()->Update(deltaTime);
 	m_player->Update(deltaTime);
@@ -242,14 +378,36 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 {
 	m_background->Draw(renderer);
 	//m_score->Draw();
-	for (auto it : m_listButton)
+	for (auto& it : m_listButton)
 	{
 		it->Draw(renderer);
 	}
 //	obj->Draw(renderer);
-	for (auto it : m_listAnimation)
+	//Draw player
+	for (auto& it : m_listAnimation)
 	{
 		it->Draw(renderer);
+	}
+
+	//Draw gun
+	for (auto& it : m_listGun)
+	{
+		if (it->GetPicked())
+			it->Draw(renderer);
+	}
+
+	//Draw bullet
+	for (auto& it : m_listBullet)
+	{
+		if (it->GetActive())
+			it->Draw(renderer);
+	}
+
+	//Draw enemy
+	for (auto& it : m_listEnemy)
+	{
+		if (it->GetEnemyAlive())
+			it->Draw(renderer);
 	}
 }
 //Move Player
@@ -270,4 +428,26 @@ void GSPlay::MovePlayer(float dx, float dy) {
 
 	// Set the new player position
 	m_player->Set2DPosition(x, y);
+}
+
+void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
+{
+
+	int m_enemySpeed = 1;
+	//tinh go'c giua enemy vs palyer
+	float angle = atan2(m_player->Get2DPosition().y - e->Get2DPosition().y, m_player->Get2DPosition().x - e->Get2DPosition().x);
+	//tinh khoang cach
+	float dist = distance(m_player->Get2DPosition().x, m_player->Get2DPosition().y, e->Get2DPosition().x, e->Get2DPosition().y);
+
+	if (dist > 10)
+	{
+		float a = e->Get2DPosition().x;
+		a += cos(angle) * m_enemySpeed;
+		float b = e->Get2DPosition().y;
+		b += sin(angle) * m_enemySpeed;
+
+		e->Set2DPosition(a, b);
+		dist = distance(m_player->Get2DPosition().x, m_player->Get2DPosition().y, a, b);
+	}
+
 }

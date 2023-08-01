@@ -104,7 +104,7 @@ void GSMenu::HandleKeyEvents(SDL_Event& e)
 
 void GSMenu::HandleTouchEvents(SDL_Event& e, bool bIsPressed)
 {
-	for (auto button : m_listButton)
+	for (auto& button : m_listButton)
 	{
 		if (button ->HandleTouchEvent(&e))
 		{
@@ -126,7 +126,7 @@ void GSMenu::Update(float deltaTime)
 		time = 0.0f;
 	}
 	m_background->Update(deltaTime);
-	for (auto it : m_listButton)
+	for (auto& it : m_listButton)
 	{
 		it->Update(deltaTime);
 	}
@@ -135,7 +135,7 @@ void GSMenu::Update(float deltaTime)
 void GSMenu::Draw(SDL_Renderer* renderer)
 {
 	m_background->Draw(renderer);
-	for (auto it : m_listButton)
+	for (auto& it : m_listButton)
 	{
 		it->Draw(renderer);
 	}

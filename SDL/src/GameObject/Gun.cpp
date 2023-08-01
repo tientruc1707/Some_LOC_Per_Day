@@ -61,3 +61,13 @@ void Gun::SetFlip(SDL_RendererFlip flip)
 {
 	m_flip = flip;
 }
+
+bool Gun::GetPicked()
+{
+	return isPicked;
+}
+
+void Gun::SetPicked(bool picked)
+{
+	isPicked = picked;
+}
