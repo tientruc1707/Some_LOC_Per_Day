@@ -1,1 +1,1 @@
-# I will update my game deverlopment progress daily! I try it!
+# I will update my game deverlopment progress daily! I will try!
