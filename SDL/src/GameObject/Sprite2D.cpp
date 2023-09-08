@@ -65,3 +65,12 @@ void Sprite2D::SetFlip(SDL_RendererFlip flip)
 	m_flip = flip;
 }
 
+void Sprite2D::DrawOriginal(SDL_Renderer* renderer)
+{
+	if (m_pTexture != nullptr)
+	{
+		m_pTexture->Render(m_position.x, m_position.y, m_iWidth, m_iHeight, m_angle, m_flip);
+	}
+
+}
+

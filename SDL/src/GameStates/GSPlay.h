@@ -6,6 +6,11 @@
 #include "Gun.h"
 #include "Bullet.h"
 
+enum ENEMIES {Enemy1, Enemy2, Enemy3, Enemy4};
+enum GUNS {Piston, M249, Soc_Lo};
+enum PLAYER_ROTATION { LEFT, RIGHT, UP, DOWN };
+
+
 class Sprite2D;
 class SpriteAnimation;
 
@@ -28,7 +33,7 @@ public:
 	void	HandleMouseMoveEvents(int x, int y) override;
 	void	Update(float deltaTime) override;
 	void	Draw(SDL_Renderer* renderer) override;
-	void	MovePlayer(float dx, float dy);
+//	void	MovePlayer(float dx, float dy);
 
 	void EnemyAutoMove(std::shared_ptr<Enemy> e);
 
@@ -39,8 +44,11 @@ private:
 	//std::shared_ptr<Text>		m_score;
 	std::list<std::shared_ptr<MouseButton>>	m_listButton;
 	std::list<std::shared_ptr<Player>>	m_listAnimation;
-	std::shared_ptr<Player> m_player;
 	std::shared_ptr<MouseButton> button;
+
+	//player
+	std::shared_ptr<Player> m_player;
+	PLAYER_ROTATION player_rotation;
 	//Enemy
 	std::shared_ptr<Enemy> m_enemy;
 	std::list<std::shared_ptr<Enemy>> m_listEnemy;

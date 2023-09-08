@@ -91,3 +91,41 @@ bool Player::GetPlayerAlive()
 {
 	return Alive;
 }
+
+void Player::MoveLeft(float deltatime)
+{
+	if (m_position.x < 0)
+	{
+		m_position.x = 0;
+	}
+	else
+		m_position.x -= 100 * deltatime;
+}
+
+void Player::MoveRight(float deltatime)
+{
+	if (m_position.x > 2 * SCREEN_WIDTH - this->GetWidth())
+	{
+		m_position.x = 2 * SCREEN_WIDTH - this->GetWidth();
+	}
+	else
+		m_position.x += 100 * deltatime;
+}
+
+void Player::MoveUp(float deltatime)
+{
+	if (m_position.y < 0)
+	{
+		m_position.y = 0;
+	}
+	m_position.y -= 100 * deltatime;
+}
+
+void Player::MoveDown(float deltatime)
+{
+	if (m_position.y > 2 * SCREEN_HEIGHT - this->GetHeight())
+	{
+		m_position.y = 2 * SCREEN_HEIGHT - this->GetHeight();
+	}
+	m_position.y += 100 * deltatime;
+}

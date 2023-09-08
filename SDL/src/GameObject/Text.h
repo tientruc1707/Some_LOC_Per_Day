@@ -10,6 +10,8 @@ public:
 	void		Init() override;
 	void		Draw(SDL_Renderer* renderer) override;
 	void		Update(float deltatime) override;
+
+	void		DrawOriginal(SDL_Renderer* renderer);
 	void LoadFromRenderText(std::string textureText);
 private:
 	//std::shared_ptr<TextureManager> m_Texture;

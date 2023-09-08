@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseObject.h"
 #include "Renderer.h"
+#include "Define.h"
 
 class Player : BaseObject
 {
@@ -20,6 +21,7 @@ protected:
 	int m_numAction;
 
 	bool Alive = true;
+
 public:
 	Player(std::shared_ptr<TextureManager> texture, int spriteRow, int frameCount, int numAction, float  frameTime);
 	~Player();
@@ -38,4 +40,10 @@ public:
 
 	void		SetPlayerAlive(bool isAlive);
 	bool		GetPlayerAlive();
+
+	void		MoveLeft(float deltatime);
+	void		MoveRight(float deltatime);
+	void		MoveUp(float deltatime);
+	void		MoveDown(float deltatime);
+
 };

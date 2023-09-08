@@ -17,6 +17,11 @@ Text::Text(std::string fontPath, SDL_Color textColor)
 	
 	
 }
+void Text::DrawOriginal(SDL_Renderer* renderer)
+{
+	m_pTexture->RenderOriginal(m_position.x, m_position.y, m_iWidth, m_iHeight);
+}
+
 void Text::LoadFromRenderText(std::string textureText)
 {
 	if (m_pTexture != nullptr)

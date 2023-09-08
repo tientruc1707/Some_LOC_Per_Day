@@ -37,13 +37,13 @@ bool MouseButton::HandleTouchEvent(SDL_Event* e)
 	return false;
 }
 
-
-void MouseButton::Draw(SDL_Renderer * renderer)
+void MouseButton::Draw(SDL_Renderer* rnederer)
 {
 	if (m_pTexture != nullptr)
 	{
-		m_pTexture->Render(m_position.x, m_position.y, m_iWidth, m_iHeight);
+		m_pTexture->RenderOriginal(m_position.x, m_position.y, m_iWidth, m_iHeight, m_angle, m_flip);
 	}
+
 }
 
 void MouseButton::SetOnClick(std::function<void(void)> pBtClick)
