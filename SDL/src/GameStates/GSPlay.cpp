@@ -23,7 +23,7 @@ double point_direction(double x1, double y1, double x2, double y2)
 	angle = angle * 180 / M_PI;
 	// Đảm bảo góc nằm trong khoảng từ 0 đến 360 độ
 	if (angle < 0)
-		angle += 360;
+		angle += 360.0;
 
 	return angle;
 }
@@ -61,25 +61,23 @@ void GSPlay::Init()
 
    // Player
 	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
-	switch (player_rotation)
+	for (int i = 0; i < 8; ++i)
 	{
-	case LEFT:
-		m_player = std::make_shared<Player>(texture, 7, 2, 8, 0.5f);
-		break;
-	case RIGHT:
-		m_player = std::make_shared<Player>(texture, 3, 2, 8, 0.5f);
-		break;
-	case UP:
-		m_player = std::make_shared<Player>(texture, 5, 2, 8, 0.5f);
-		break;
-	case DOWN:
-		m_player = std::make_shared<Player>(texture, 1, 2, 8, 0.5f);
-		break;
-	default:
-		break;
+		if (i == 6) {
+			playerRotation = std::make_shared<Player>(texture, 0, 2, 8, 0.5f);
+		}
+		else if (i == 7) {
+			playerRotation = std::make_shared<Player>(texture, 1, 2, 8, 0.5f);
+		}
+		else {
+			playerRotation = std::make_shared<Player>(texture, i + 3, 2, 8, 0.5f);
+		}
+		playerRotation->SetFlip(SDL_FLIP_NONE);
+		playerRotation->SetSize(40, 50);
+		m_listAnimation.push_back(playerRotation);
+
 	}
-	m_player->SetFlip(SDL_FLIP_NONE);
-	m_player->SetSize(40, 50);
+	m_player = m_listAnimation[0];
 	m_player->Set2DPosition(240, 400);
 
 
@@ -122,25 +120,25 @@ void GSPlay::Init()
 		m_listBullet.push_back(m_bullet);
 	}
 	//Gun
-		//piston
-		m_gun2 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR2.png"),SDL_FLIP_NONE);
-		m_gun2->SetSize(20, 20);
-		m_gun2->SetPicked(true);
-		m_listGun.push_back(m_gun2);
+		////piston
+		//m_gun2 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR2.png"),SDL_FLIP_NONE);
+		//m_gun2->SetSize(20, 20);
+		//m_gun2->SetPicked(true);
+		//m_listGun.push_back(m_gun2);
 	
 		//M249
-		m_gun1 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"),SDL_FLIP_NONE);
-		m_gun1->SetSize(30, 20);
-		m_gun1->SetPicked(false);
-		m_gun1->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
-		m_listGun.push_back(m_gun1);
+		m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"),SDL_FLIP_NONE);
+		m_gun->SetSize(30, 20);
+		m_gun->SetPicked(false);
+		m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+		m_listGun.push_back(m_gun);
 
-		//Soc Lo
-		m_gun3 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"),SDL_FLIP_NONE);
-		m_gun3->SetSize(40, 20);
-		m_gun3->SetPicked(false);
-		m_gun3->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
-		m_listGun.push_back(m_gun3);
+		////Soc Lo
+		//m_gun3 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"),SDL_FLIP_NONE);
+		//m_gun3->SetSize(40, 20);
+		//m_gun3->SetPicked(false);
+		//m_gun3->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+		//m_listGun.push_back(m_gun3);
 
 	Camera::GetInstance()->SetTarget(m_player);
 
@@ -152,16 +150,15 @@ void GSPlay::Exit()
 	
 }
 
-
 void GSPlay::Pause()
 {
 
 }
+
 void GSPlay::Resume()
 {
 	
 }
-
 
 void GSPlay::HandleEvents()
 {
@@ -169,24 +166,34 @@ void GSPlay::HandleEvents()
 
 void GSPlay::HandleKeyEvents(SDL_Event& e)
 {
+	double midPoint_x = (m_player->Get2DPosition().x + m_player->GetWidth()) / 2;
+	double midPoint_y = (m_player->Get2DPosition().y + m_player->GetHeight()) / 2;
 	//If a key was pressed
 	switch (e.type) {
-	case SDL_KEYDOWN: 
-		if(e.key.repeat == 0) //For e.key.repeat it's because key repeat is enabled by default and if you press and hold a key it will report multiple key presses. That means we have to check if the key press is the first one because we only care when the key was first pressed.
+	case SDL_KEYDOWN:
+		if (e.key.repeat == 0) //For e.key.repeat it's because key repeat is enabled by default and if you press and hold a key it will report multiple key presses. That means we have to check if the key press is the first one because we only care when the key was first pressed.
 		{
 			//Adjust the velocity
 			switch (e.key.keysym.sym)
 			{
 			case SDLK_w:
+				//playerDirection = UP;
+
 				m_KeyPress |= KEY_UP;
 				break;
 			case SDLK_s:
+				//playerDirection = DOWN;
+
 				m_KeyPress |= KEY_DOWN;
 				break;
 			case SDLK_a:
+				//playerDirection = LEFT;
+
 				m_KeyPress |= KEY_LEFT;
 				break;
 			case SDLK_d:
+				//playerDirection = RIGHT;
+
 				m_KeyPress |= KEY_RIGHT;
 				break;
 			default:
@@ -197,7 +204,7 @@ void GSPlay::HandleKeyEvents(SDL_Event& e)
 		break;
 		////Key Up
 	case SDL_KEYUP:
-		if(e.key.repeat == 0)
+		if (e.key.repeat == 0)
 		{
 			//Adjust the velocity
 			switch (e.key.keysym.sym)
@@ -223,29 +230,28 @@ void GSPlay::HandleKeyEvents(SDL_Event& e)
 		//mouse motion
 	case SDL_MOUSEMOTION:
 		//rotation of gun
-		for (auto& weapon : m_listGun)
-		{
 			// x > && y <
-			if (weapon->Get2DPosition().x >= SCREEN_WIDTH && weapon->Get2DPosition().y < SCREEN_HEIGHT)
-			{
-				gunAngle = point_direction(weapon->Get2DPosition().x, weapon->Get2DPosition().y, 2 * e.motion.x, e.motion.y);
-			}
-			// x < && y >
-			else if (weapon->Get2DPosition().x < SCREEN_WIDTH && weapon->Get2DPosition().y >= SCREEN_HEIGHT)
-			{
-				gunAngle = point_direction(weapon->Get2DPosition().x, weapon->Get2DPosition().y, e.motion.x, 2 * e.motion.y);
-			}
-			// x > && y >
-			else if (weapon->Get2DPosition().x >= SCREEN_WIDTH && weapon->Get2DPosition().y >= SCREEN_HEIGHT)
-			{
-				gunAngle = point_direction(weapon->Get2DPosition().x, weapon->Get2DPosition().y, 2 * e.motion.x, 2 * e.motion.y);
-			}
-			// x < && y <
-			else
-			{
-				gunAngle = point_direction(weapon->Get2DPosition().x, weapon->Get2DPosition().y, e.motion.x, e.motion.y);
-			}
+		if (midPoint_x >= SCREEN_WIDTH && m_gun->Get2DPosition().y < SCREEN_HEIGHT)
+		{
+			gunAngle = point_direction(midPoint_x, midPoint_y, 2 * e.motion.x, e.motion.y);
 		}
+		// x < && y >
+		else if (midPoint_x < SCREEN_WIDTH && midPoint_y >= SCREEN_HEIGHT)
+		{
+			gunAngle = point_direction(midPoint_x, midPoint_y, e.motion.x, 2 * e.motion.y);
+		}
+		// x > && y >
+		else if (midPoint_x >= SCREEN_WIDTH && midPoint_y >= SCREEN_HEIGHT)
+		{
+			gunAngle = point_direction(midPoint_x, midPoint_y, 2 * e.motion.x, 2 * e.motion.y);
+		}
+		// x < && y <
+		else
+		{
+			gunAngle = point_direction(midPoint_x, m_gun->Get2DPosition().y, e.motion.x, e.motion.y);
+		}
+		currentAngleIndex = getAngleIndex(gunAngle, numAngle, angleSteps);
+
 		break;
 		//left mouse click
 	case SDL_MOUSEBUTTONDOWN:
@@ -256,15 +262,11 @@ void GSPlay::HandleKeyEvents(SDL_Event& e)
 				if (!it->GetActive()) //if bullet doesn't active
 				{
 					if (curentTime - m_lastShoot > m_shootDelay) {
-						for (auto& gun : m_listGun) {
-							if (gun->GetPicked()) {//each gun of listgun
-								it->Set2DPosition(gun->Get2DPosition().x + gun->GetWidth() / 2,
-												  gun->Get2DPosition().y + gun->GetHeight() / 2);
-								it->SetRotation(gunAngle);
-								it->SetActive(true);
-								m_lastShoot = curentTime;
-							}
-						}
+						it->Set2DPosition(m_gun->Get2DPosition().x + m_gun->GetWidth() / 2,
+							m_gun->Get2DPosition().y + m_gun->GetHeight() / 2);
+						it->SetRotation(gunAngle);
+						it->SetActive(true);
+						m_lastShoot = curentTime;
 					}
 				}
 			}
@@ -292,11 +294,6 @@ float time1 = 0.0f;
 void GSPlay::Update(float deltaTime)
 {
 	//Handle KeyEvent
-	switch (m_KeyPress)
-	{
-	default:
-		break;
-	}
 
 	//Update Button
 	for (auto& it : m_listButton)
@@ -309,26 +306,29 @@ void GSPlay::Update(float deltaTime)
 	switch (m_KeyPress)
 	{
 	case 1: // Move left
-		player_rotation = LEFT;
+
 		m_player->MoveLeft(deltaTime);
 		break;
 	case 2: // Move down
-		player_rotation = DOWN;
+
 		m_player->MoveDown(deltaTime);
 		break;
 	case 4: // Move right
-		player_rotation = RIGHT;
+
 		m_player->MoveRight(deltaTime);
 		break;
 	case 8: // Move up
-		player_rotation = UP;
+
 		m_player->MoveUp(deltaTime);
 		break;
 	default:
 		break;
 	}
-	m_player->Update(deltaTime);
-
+	m_player = m_listAnimation[currentAngleIndex];
+	for (auto& it : m_listAnimation) {
+		it->Set2DPosition(m_player->Get2DPosition().x, m_player->Get2DPosition().y);
+		it->Update(deltaTime);
+	}
 	//Update Enemy
 	for (auto& it : m_listEnemy)
 	{
@@ -370,7 +370,6 @@ void GSPlay::Update(float deltaTime)
 	//		/*m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy2.tga"), 1, 1, 7, 0.5f);
 	//		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy3.tga"), 1, 1, 7, 0.5f);
 	//		m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy4.tga"), 1, 1, 7, 0.5f);*/
-
 	//		m_enemy->SetFlip(SDL_FLIP_NONE);
 	//		m_enemy->SetSize(30, 45);
 	//		m_enemy->Set2DPosition(rand() % SCREEN_WIDTH,
@@ -382,35 +381,30 @@ void GSPlay::Update(float deltaTime)
 	//}
 
 	//Update Gun
-	for (auto& it : m_listGun)
+	float x = m_player->Get2DPosition().x,
+		y = m_player->Get2DPosition().y,
+		w = m_player->GetWidth(),
+		h = m_player->GetHeight();
+	//Hand Posision
+	double handX = x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
+	double handY = y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
+	//Pick Gun
+	/*if (checkVAR(x, y, w, h, m_gun1->Get2DPosition().x, m_gun1->Get2DPosition().y, m_gun1->GetWidth(), m_gun1->GetHeight()))
 	{
-		float x = m_player->Get2DPosition().x,
-			y = m_player->Get2DPosition().y,
-			w = m_player->GetWidth(),
-			h = m_player->GetHeight();
-		//Hand Posision
-		double handX = x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
-		double handY = y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
-		//Pick Gun
-		if (checkVAR(x, y, w, h, m_gun1->Get2DPosition().x, m_gun1->Get2DPosition().y, m_gun1->GetWidth(), m_gun1->GetHeight()))
-		{
-			m_gun1->SetPicked(true);
-			m_gun2->SetPicked(false);
-			m_gun3->SetPicked(false);
-		}
-		if (checkVAR(x, y, w, h, m_gun2->Get2DPosition().x, m_gun2->Get2DPosition().y, m_gun2->GetWidth(), m_gun2->GetHeight()))
-		{
-			m_gun1->SetPicked(false);
-			m_gun2->SetPicked(false);
-			m_gun3->SetPicked(true);
-		}
-		//Pick gun done
-		if (it->GetPicked()) {
-			it->SetRotation(gunAngle);
-			//Set Gun on Hand
-			it->Set2DPosition(handX - it->GetWidth() / 2, handY - it->GetHeight() / 2);
-		}
+		m_gun1->SetPicked(true);
+		m_gun2->SetPicked(false);
+		m_gun3->SetPicked(false);
 	}
+	if (checkVAR(x, y, w, h, m_gun2->Get2DPosition().x, m_gun2->Get2DPosition().y, m_gun2->GetWidth(), m_gun2->GetHeight()))
+	{
+		m_gun1->SetPicked(false);
+		m_gun2->SetPicked(false);
+		m_gun3->SetPicked(true);
+	}*/
+	//Pick gun done
+	m_gun->SetRotation(gunAngle);
+	//Set Gun on Hand
+	m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY - m_gun->GetHeight() / 2);
 
 	//Update BUllet
 	for (auto& it : m_listBullet) {
@@ -450,14 +444,20 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 	}
 //	obj->Draw(renderer);
 	//Draw player
-	m_player->Draw(renderer);
+	for (auto& it : m_listAnimation)
+	{
+		if (it == m_player)
+		{
+			it->Draw(renderer);
+		}
+	}
 	//Draw gun
-	for (auto& it : m_listGun)
+	/*for (auto& it : m_listGun)
 	{
 		if (it->GetPicked())
 			it->Draw(renderer);
-	}
-
+	}*/
+	m_gun->Draw(renderer);
 	//Draw bullet
 	for (auto& it : m_listBullet)
 	{
@@ -512,4 +512,13 @@ void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
 		dist = distance(m_player->Get2DPosition().x, m_player->Get2DPosition().y, a, b);
 	}
 
+}
+
+int GSPlay::getAngleIndex(double gunAngle, int numAngles, double angleSteps)
+{
+	
+	//làm tròn gunANgle đến số int gần nhất
+	int roundedAngle = (int)round(gunAngle);
+	int angleIndex = (roundedAngle / (int)angleSteps) % numAngles;
+	return angleIndex;
 }

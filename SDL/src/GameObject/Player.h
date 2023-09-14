@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include "Define.h"
 
+using PLAYER_DIRECTION = enum { LEFT, RIGHT, UP, DOWN };
+
 class Player : BaseObject
 {
 protected:
@@ -21,7 +23,7 @@ protected:
 	int m_numAction;
 
 	bool Alive = true;
-
+	bool choseRotation = false;
 public:
 	Player(std::shared_ptr<TextureManager> texture, int spriteRow, int frameCount, int numAction, float  frameTime);
 	~Player();

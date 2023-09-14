@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GameStateBase.h"
 #include "GameObject/MouseButton.h"
 #include "Enemy.h"
@@ -8,7 +8,7 @@
 
 enum ENEMIES {Enemy1, Enemy2, Enemy3, Enemy4};
 enum GUNS {Piston, M249, Soc_Lo};
-enum PLAYER_ROTATION { LEFT, RIGHT, UP, DOWN };
+
 
 
 class Sprite2D;
@@ -36,6 +36,8 @@ public:
 //	void	MovePlayer(float dx, float dy);
 
 	void EnemyAutoMove(std::shared_ptr<Enemy> e);
+	//Lấy chỉ số của hướng xxoay
+	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
 	int m_KeyPress;
 
@@ -43,17 +45,16 @@ private:
 	std::shared_ptr<Sprite2D>	m_background;
 	//std::shared_ptr<Text>		m_score;
 	std::list<std::shared_ptr<MouseButton>>	m_listButton;
-	std::list<std::shared_ptr<Player>>	m_listAnimation;
+	std::vector<std::shared_ptr<Player>>	m_listAnimation;
 	std::shared_ptr<MouseButton> button;
 
 	//player
-	std::shared_ptr<Player> m_player;
-	PLAYER_ROTATION player_rotation;
+	std::shared_ptr<Player> m_player, playerRotation;
 	//Enemy
 	std::shared_ptr<Enemy> m_enemy;
 	std::list<std::shared_ptr<Enemy>> m_listEnemy;
 	//Gun
-	std::shared_ptr<Gun> m_gun1, m_gun2, m_gun3, m_selectedGun;
+	std::shared_ptr<Gun> m_gun;
 	std::list<std::shared_ptr<Gun>> m_listGun;
 	//Bullet
 	std::shared_ptr<Bullet> m_bullet;
@@ -66,6 +67,12 @@ private:
 	float m_lastShoot = 0.0;
 	float gunAngle = 0.0;
 
-	int playerDirection = 1;
+	//int playerDirection = 1;
+	//số hướng quay
+	int numAngle = 8;
+	//độ chia nhỏ nhất
+	double angleSteps = 360.0 / numAngle;
+	//hướng quay được chọn
+	int currentAngleIndex = 0;
 };
 
