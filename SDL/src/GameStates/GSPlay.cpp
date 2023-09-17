@@ -40,16 +40,14 @@ GSPlay::~GSPlay()
 
 void GSPlay::Init()
 {
-	//auto model = ResourceManagers::GetInstance()->GetModel("Sprite2D.nfg");
 	auto texture = ResourceManagers::GetInstance()->GetTexture("bgr_game.png");
 
-	// background
-	
+	//background
 	m_background = std::make_shared<Sprite2D>( texture, SDL_FLIP_NONE);
 	m_background->SetSize(2 * SCREEN_WIDTH, 2 * SCREEN_HEIGHT);
 	m_background->Set2DPosition(0, 0);
 
-	// button close
+	//button close
 	texture = ResourceManagers::GetInstance()->GetTexture("Next_Button.png");
 	button = std::make_shared<MouseButton>( texture, SDL_FLIP_NONE);
 	button->SetSize(50, 50);
@@ -59,7 +57,7 @@ void GSPlay::Init()
 		});
 	m_listButton.push_back(button);
 
-   // Player
+   // Player and rotation
 	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
 	for (int i = 7; i >= 0; i--)
 	{
@@ -76,7 +74,6 @@ void GSPlay::Init()
 	}
 	m_player = m_listAnimation[0];
 	m_player->Set2DPosition(240, 400);
-
 
 	int value = 0;
 	//random chose enemy
@@ -102,7 +99,6 @@ void GSPlay::Init()
 			break;
 		}
 		
-		m_enemy->SetFlip(SDL_FLIP_NONE);
 		m_enemy->SetSize(100, 100);
 		m_enemy->Set2DPosition(rand() % 2 * SCREEN_WIDTH, rand() % 2 * SCREEN_HEIGHT);
 		m_enemy->SetEnemyAlive(true);
@@ -329,12 +325,15 @@ void GSPlay::Update(float deltaTime)
 	//Update Enemy
 	for (auto& it : m_listEnemy)
 	{
-		GSPlay::EnemyAutoMove(it);
 		// Get the enemy position and size
 		float ex = it->Get2DPosition().x;
 		float ey = it->Get2DPosition().y;
 		float ew = it->GetWidth();
 		float eh = it->GetHeight();
+
+		//Move to Player
+		GSPlay::EnemyAutoMove(it);
+		it->SetFlip(ex - m_player->Get2DPosition().x > 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
 		if (it->GetEnemyAlive()) //if enemy alive
 		{
@@ -469,25 +468,6 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 			it->Draw(renderer);
 	}
 }
-//Move Player
-//void GSPlay::MovePlayer(float dx, float dy) {
-//	// Get the player position and size
-//	float x = m_player->Get2DPosition().x;
-//	float y = m_player->Get2DPosition().y;
-//	float w = m_player->GetWidth();
-//	float h = m_player->GetHeight();
-//
-//	// Move the player by dx and dy
-//	x += dx;
-//	y += dy;
-//
-//	// Clamp the player position to the screen boundary
-//	x = std::max(0.0f, std::min(x, SCREEN_WIDTH - w));
-//	y = std::max(0.0f, std::min(y, SCREEN_HEIGHT - h));
-//
-//	// Set the new player position
-//	m_player->Set2DPosition(x, y);
-//}
 
 void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
 {
@@ -508,7 +488,6 @@ void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
 		e->Set2DPosition(a, b);
 		dist = distance(m_player->Get2DPosition().x, m_player->Get2DPosition().y, a, b);
 	}
-
 }
 
 int GSPlay::getAngleIndex(double gunAngle, int numAngles, double angleSteps)

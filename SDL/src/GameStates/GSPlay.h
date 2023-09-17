@@ -44,30 +44,34 @@ public:
 private:
 	std::shared_ptr<Sprite2D>	m_background;
 	//std::shared_ptr<Text>		m_score;
+
+	//Button
 	std::list<std::shared_ptr<MouseButton>>	m_listButton;
-	std::vector<std::shared_ptr<Player>>	m_listAnimation;
 	std::shared_ptr<MouseButton> button;
 
 	//player
-	std::shared_ptr<Player> m_player, playerRotation;
+	std::shared_ptr<Player>					 m_player;
+	std::shared_ptr<Player>					playerRotation;
+	std::vector<std::shared_ptr<Player>>	m_listAnimation;
+
 	//Enemy
 	std::shared_ptr<Enemy> m_enemy;
 	std::list<std::shared_ptr<Enemy>> m_listEnemy;
+
 	//Gun
 	std::shared_ptr<Gun> m_gun;
 	std::list<std::shared_ptr<Gun>> m_listGun;
+
 	//Bullet
 	std::shared_ptr<Bullet> m_bullet;
 	std::list<std::shared_ptr<Bullet>> m_listBullet;
 
 	float time = 0.0f;
-	float m_Velocity = 10.0f;
-
+	
 	float m_shootDelay = 20;
 	float m_lastShoot = 0.0;
 	float gunAngle = 0.0;
 
-	//int playerDirection = 1;
 	//số hướng quay
 	int numAngle = 8;
 	//độ chia nhỏ nhất
