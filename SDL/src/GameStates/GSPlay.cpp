@@ -61,17 +61,14 @@ void GSPlay::Init()
 
    // Player
 	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
-	for (int i = 0; i < 8; ++i)
+	for (int i = 7; i >= 0; i--)
 	{
-		if (i == 6) {
-			playerRotation = std::make_shared<Player>(texture, 0, 2, 8, 0.5f);
-		}
-		else if (i == 7) {
-			playerRotation = std::make_shared<Player>(texture, 1, 2, 8, 0.5f);
-		}
-		else {
+		if(i == 7)
+			playerRotation = std::make_shared<Player>(texture, 2, 2, 8, 0.5f);
+		else if (i == 6)
+			playerRotation = std::make_shared<Player>(texture, 1 , 2, 8, 0.5f);
+		else
 			playerRotation = std::make_shared<Player>(texture, i + 3, 2, 8, 0.5f);
-		}
 		playerRotation->SetFlip(SDL_FLIP_NONE);
 		playerRotation->SetSize(40, 50);
 		m_listAnimation.push_back(playerRotation);
@@ -289,8 +286,8 @@ void GSPlay::HandleTouchEvents(SDL_Event& e, bool bIsPressed)
 void GSPlay::HandleMouseMoveEvents(int x, int y)
 {
 }
-float time1 = 0.0f;
 
+float time1 = 0.0f;
 void GSPlay::Update(float deltaTime)
 {
 	//Handle KeyEvent
