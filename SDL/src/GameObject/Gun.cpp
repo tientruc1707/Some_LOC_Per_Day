@@ -16,7 +16,7 @@ void Gun::Draw(SDL_Renderer* renderer)
 {
 	if (m_pTexture != nullptr)
 	{
-		m_pTexture->Render(m_position.x, m_position.y, m_iWidth, m_iHeight, m_angle, m_flip);
+		m_pTexture->RenderOriginal(m_position.x, m_position.y, m_iWidth, m_iHeight, m_angle, m_flip);
 	}
 
 }

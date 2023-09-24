@@ -72,8 +72,8 @@ void GSMenu::Init()
 	m_textGameName->SetSize(300, 50);
 	m_textGameName->Set2DPosition((SCREEN_WIDTH - m_textGameName->GetWidth())/2, SCREEN_HEIGHT / 2 - 300);
 	m_textGameName->LoadFromRenderText("Your Game");
-	m_Sound = std::make_shared<Sound>("Data/Sounds/Still_Want_It.mp3");
-	m_Sound->PlaySound();
+	//m_Sound = std::make_shared<Sound>("Data/Sounds/Still_Want_It.mp3");
+	//m_Sound->PlaySound();
 }
 
 void GSMenu::Exit()

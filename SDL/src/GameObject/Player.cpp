@@ -3,14 +3,13 @@
 #include "SpriteAnimation.h"
 #include "BaseObject.h"
 
-Player::Player(std::shared_ptr<TextureManager> texture, int spriteRow, int frameCount, int numAction, float frameTime) : BaseObject(texture)
+Player::Player(std::shared_ptr<TextureManager> texture, int spriteRow, int frameCount, int numAction, float frameTime)
+	: BaseObject(texture)
 {
 	m_spriteRow = spriteRow;
 	m_frameCount = frameCount;
 	m_numAction = numAction;
-	//m_animSpeed = animSpeed;
 	m_frameTime = frameTime;
-	//m_flip = flip;
 	m_currentFrame = 0;
 	m_currentTicks = 0;
 	m_lastUpdate = SDL_GetTicks();
@@ -29,7 +28,8 @@ void Player::Draw(SDL_Renderer* renderer)
 {
 	if (m_pTexture != nullptr)
 	{
-		m_pTexture->RenderFrame(m_position.x, m_position.y, m_iWidth, m_iHeight, m_spriteRow, m_currentFrame, m_frameCount, m_numAction, m_angle, m_flip);
+		m_pTexture->RenderFrame1(m_position.x, m_position.y, m_iWidth, m_iHeight, m_spriteRow,
+								m_currentFrame, m_frameCount, m_numAction, m_angle, m_flip);
 	}
 }
 
@@ -99,17 +99,17 @@ void Player::MoveLeft(float deltatime)
 		m_position.x = 0;
 	}
 	else
-		m_position.x -= 100 * deltatime;
+		m_position.x -= PLAYER_SPEED * deltatime;
 }
 
 void Player::MoveRight(float deltatime)
 {
-	if (m_position.x > 2 * SCREEN_WIDTH - this->GetWidth())
+	if (m_position.x > SCREEN_WIDTH - this->GetWidth())
 	{
-		m_position.x = 2 * SCREEN_WIDTH - this->GetWidth();
+		m_position.x = SCREEN_WIDTH - this->GetWidth();
 	}
 	else
-		m_position.x += 100 * deltatime;
+		m_position.x += PLAYER_SPEED * deltatime;
 }
 
 void Player::MoveUp(float deltatime)
@@ -118,14 +118,14 @@ void Player::MoveUp(float deltatime)
 	{
 		m_position.y = 0;
 	}
-	m_position.y -= 100 * deltatime;
+	m_position.y -= PLAYER_SPEED * deltatime;
 }
 
 void Player::MoveDown(float deltatime)
 {
-	if (m_position.y > 2 * SCREEN_HEIGHT - this->GetHeight())
+	if (m_position.y > SCREEN_HEIGHT - this->GetHeight())
 	{
-		m_position.y = 2 * SCREEN_HEIGHT - this->GetHeight();
+		m_position.y = SCREEN_HEIGHT - this->GetHeight();
 	}
-	m_position.y += 100 * deltatime;
+	m_position.y += PLAYER_SPEED * deltatime;
 }

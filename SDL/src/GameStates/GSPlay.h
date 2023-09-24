@@ -5,11 +5,11 @@
 #include "Player.h"
 #include "Gun.h"
 #include "Bullet.h"
+#include "PauseGame.h"
+
 
 enum ENEMIES {Enemy1, Enemy2, Enemy3, Enemy4};
 enum GUNS {Piston, M249, Soc_Lo};
-
-
 
 class Sprite2D;
 class SpriteAnimation;
@@ -39,6 +39,7 @@ public:
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
+	bool isPause = false;
 	int m_KeyPress;
 
 private:
@@ -50,8 +51,9 @@ private:
 	std::shared_ptr<MouseButton> button;
 
 	//player
-	std::shared_ptr<Player>					 m_player;
+	std::shared_ptr<Player>					m_player;
 	std::shared_ptr<Player>					playerRotation;
+	std::shared_ptr<Player>					m_currentAnimation;
 	std::vector<std::shared_ptr<Player>>	m_listAnimation;
 
 	//Enemy
@@ -66,6 +68,11 @@ private:
 	std::shared_ptr<Bullet> m_bullet;
 	std::list<std::shared_ptr<Bullet>> m_listBullet;
 
+	//Pause
+	std::shared_ptr<PauseGame> pRestart;
+	std::shared_ptr<PauseGame> pResume;
+	std::shared_ptr<PauseGame> pSound;
+	std::vector<std::shared_ptr<PauseGame>> listOption;
 	float time = 0.0f;
 	
 	float m_shootDelay = 20;
