@@ -186,7 +186,7 @@
     <ClCompile Include="src\GameStates\GSIntro.cpp" />
     <ClCompile Include="src\GameStates\GSMenu.cpp" />
     <ClCompile Include="src\GameStates\GSPlay.cpp" />
-    <ClCompile Include="src\GameStates\PauseGame.cpp" />
+    <ClCompile Include="src\GameStates\GSPause.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -214,7 +214,7 @@
     <ClInclude Include="src\GameStates\GSIntro.h" />
     <ClInclude Include="src\GameStates\GSMenu.h" />
     <ClInclude Include="src\GameStates\GSPlay.h" />
-    <ClInclude Include="src\GameStates\PauseGame.h" />
+    <ClInclude Include="src\GameStates\GSPause.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,7 @@
 #pragma once
 #define SCREEN_WIDTH 900
 #define SCREEN_HEIGHT 600
-#define MAX_ENEMY 20
+constexpr auto MAX_ENEMY = 40;
 
 #define KEY_LEFT 1 // 00000001
 #define KEY_DOWN 2 // 00000010

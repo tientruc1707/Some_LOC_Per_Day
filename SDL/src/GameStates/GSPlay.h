@@ -5,7 +5,7 @@
 #include "Player.h"
 #include "Gun.h"
 #include "Bullet.h"
-#include "PauseGame.h"
+#include "GSPause.h"
 
 
 enum ENEMIES {Enemy1, Enemy2, Enemy3, Enemy4};
@@ -32,6 +32,8 @@ public:
 	void	HandleTouchEvents(SDL_Event& e, bool bIsPressed) override;
 	void	HandleMouseMoveEvents(int x, int y) override;
 	void	Update(float deltaTime) override;
+	void drawRect(SDL_Renderer* renderer);
+	void drawEnemyRect(SDL_Renderer* renderer);
 	void	Draw(SDL_Renderer* renderer) override;
 //	void	MovePlayer(float dx, float dy);
 
@@ -39,6 +41,7 @@ public:
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
+	//React
 	bool isPause = false;
 	int m_KeyPress;
 
@@ -68,13 +71,7 @@ private:
 	std::shared_ptr<Bullet> m_bullet;
 	std::list<std::shared_ptr<Bullet>> m_listBullet;
 
-	//Pause
-	std::shared_ptr<PauseGame> pRestart;
-	std::shared_ptr<PauseGame> pResume;
-	std::shared_ptr<PauseGame> pSound;
-	std::vector<std::shared_ptr<PauseGame>> listOption;
 	float time = 0.0f;
-	
 	float m_shootDelay = 20;
 	float m_lastShoot = 0.0;
 	float gunAngle = 0.0;
