@@ -68,10 +68,10 @@ void GSMenu::Init()
 	// game title
 	///Set Font
 	m_textColor = { 255, 255, 0 };
-	m_textGameName = std::make_shared<Text>("Data/BodoniFLF-Italic.ttf", m_textColor);
+	m_textGameName = std::make_shared<Text>("Data/NotJamChunkySans.ttf", m_textColor, 28);
 	m_textGameName->SetSize(300, 50);
-	m_textGameName->Set2DPosition((SCREEN_WIDTH - m_textGameName->GetWidth())/2, SCREEN_HEIGHT / 2 - 300);
-	m_textGameName->LoadFromRenderText("Your Game");
+	m_textGameName->Set2DPosition((SCREEN_WIDTH - m_textGameName->GetWidth())/2, (SCREEN_HEIGHT - 300) / 2 );
+	m_textGameName->LoadFromRenderText("Monster Attack");
 	//m_Sound = std::make_shared<Sound>("Data/Sounds/Still_Want_It.mp3");
 	//m_Sound->PlaySound();
 }
@@ -139,5 +139,5 @@ void GSMenu::Draw(SDL_Renderer* renderer)
 	{
 		it->Draw(renderer);
 	}
-	m_textGameName->DrawOriginal(renderer);
+	m_textGameName->Draw(renderer);
 }

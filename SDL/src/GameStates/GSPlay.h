@@ -5,8 +5,8 @@
 #include "Player.h"
 #include "Gun.h"
 #include "Bullet.h"
-#include "GSPause.h"
-
+#include "Timer.h"
+#include "GameObject/Text.h"
 
 enum ENEMIES {Enemy1, Enemy2, Enemy3, Enemy4};
 enum GUNS {Piston, M249, Soc_Lo};
@@ -41,10 +41,14 @@ public:
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
-	//React
-	bool isPause = false;
+	//Time countdown
+	Uint32 startTime = SDL_GetTicks();
+	Uint32 currentTime, elapsedTime;
+	int countdown = 2 * 60;
+	SDL_Color BLACK;
 	int m_KeyPress;
-
+	float spawnTime = timeToSpawn;
+	bool isGameOver = false;
 private:
 	std::shared_ptr<Sprite2D>	m_background;
 	//std::shared_ptr<Text>		m_score;
@@ -70,6 +74,10 @@ private:
 	//Bullet
 	std::shared_ptr<Bullet> m_bullet;
 	std::list<std::shared_ptr<Bullet>> m_listBullet;
+
+	//Time countdown
+	std::shared_ptr<Text>		min;
+	std::shared_ptr<Text>		sec;
 
 	float time = 0.0f;
 	float m_shootDelay = 20;
