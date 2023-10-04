@@ -3,6 +3,7 @@
 #include "Sprite2D.h"
 #include <functional>
 
+
 class MouseButton : public Sprite2D
 {
 public:
@@ -11,11 +12,11 @@ public:
 	MouseButton();
 	MouseButton(std::shared_ptr<TextureManager> texture, SDL_RendererFlip flip);
 
+
 	//Handles mouse event
 	bool HandleTouchEvent(SDL_Event* e);
 	//Show button sprite
 	void Draw(SDL_Renderer * renderer) override;
-	//SDL_Point* GetButtonPosition();
 	
 	void	SetOnClick(std::function<void(void)>pBtClick);
 private:
@@ -23,6 +24,5 @@ private:
 	//Top left position
 	//SDL_Point* mPosition;
 	//Currently used global sprite
-	
 };
 

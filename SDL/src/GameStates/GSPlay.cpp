@@ -44,13 +44,13 @@ void GSPlay::Init()
 	auto texture = ResourceManagers::GetInstance()->GetTexture("bgr_game.png");
 
 	//background
-	m_background = std::make_shared<Sprite2D>( texture, SDL_FLIP_NONE);
+	m_background = std::make_shared<Sprite2D>(texture, SDL_FLIP_NONE);
 	m_background->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	m_background->Set2DPosition(0, 0);
 
 	//button pause
 	texture = ResourceManagers::GetInstance()->GetTexture("Pause_Button.png");
-	button = std::make_shared<MouseButton>( texture, SDL_FLIP_NONE);
+	button = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
 	button->SetSize(50, 50);
 	button->Set2DPosition(SCREEN_WIDTH - 50, 10);
 	button->SetOnClick([this]() {
@@ -58,14 +58,14 @@ void GSPlay::Init()
 		});
 	m_listButton.push_back(button);
 
-   // Player and rotation
+	// Player and rotation
 	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
 	for (int i = 7; i >= 0; i--)
 	{
-		if(i == 7)
+		if (i == 7)
 			playerRotation = std::make_shared<Player>(texture, 2, 2, 8, 0.5f);
 		else if (i == 6)
-			playerRotation = std::make_shared<Player>(texture, 1 , 2, 8, 0.5f);
+			playerRotation = std::make_shared<Player>(texture, 1, 2, 8, 0.5f);
 		else
 			playerRotation = std::make_shared<Player>(texture, i + 3, 2, 8, 0.5f);
 		playerRotation->SetFlip(SDL_FLIP_NONE);
@@ -89,22 +89,49 @@ void GSPlay::Init()
 		//m_gun2->SetSize(20, 20);
 		//m_gun2->SetPicked(true);
 		//m_listGun.push_back(m_gun2);
-	
+
 		//M249
-		m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"),SDL_FLIP_NONE);
-		m_gun->SetSize(30, 20);
-		m_gun->SetPicked(false);
-		m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
-		m_listGun.push_back(m_gun);
+	m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"), SDL_FLIP_NONE);
+	m_gun->SetSize(30, 20);
+	m_gun->SetPicked(false);
+	m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+	m_listGun.push_back(m_gun);
+	
+	//Score
+	m_score = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
+	m_score->SetSize(110, 40);
+	m_score->Set2DPosition((SCREEN_WIDTH - m_score->GetWidth()) / 2, 30);
+	m_score->LoadFromRenderText("SCORE : ");
 
-		////Soc Lo
-		//m_gun3 = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"),SDL_FLIP_NONE);
-		//m_gun3->SetSize(40, 20);
-		//m_gun3->SetPicked(false);
-		//m_gun3->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
-		//m_listGun.push_back(m_gun3);
+	score = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
+	score->SetSize(50, 40);
+	score->Set2DPosition(m_score->Get2DPosition().x + m_score->GetWidth() + 5, 30);
 
-	//Camera::GetInstance()->SetTarget(m_player);
+	//Hearth
+	for (int i = 0; i < heart_nums; ++i)
+	{
+		int x = i * 50 + 10;
+		heartIcon = std::make_shared<Sprite2D>(ResourceManagers::GetInstance()->GetTexture("heart.png"), SDL_FLIP_NONE);
+		heartIcon->SetSize(50, 50);
+		heartIcon->Set2DPosition(x, 80);
+		listHearthIcon.push_back(heartIcon);
+	}
+	//Winer
+	Winer = std::make_shared<SpriteAnimation>(ResourceManagers::GetInstance()->GetTexture("victory.jpg"), 2, 5, 4, 0.2f);
+	Winer->SetSize(300, 300);
+	Winer->Set2DPosition((SCREEN_WIDTH - Winer->GetWidth()) / 2, (SCREEN_HEIGHT - Winer->GetHeight()) / 2);
+
+	Loser = std::make_shared<Sprite2D>(ResourceManagers::GetInstance()->GetTexture("Lose.jpg"), SDL_FLIP_NONE);
+	Loser->SetSize(500,300);
+	Loser->Set2DPosition((SCREEN_WIDTH - Loser->GetWidth()) / 2, (SCREEN_HEIGHT - Loser->GetHeight()) / 2);
+	
+	backToHome = std::make_shared<MouseButton>(ResourceManagers::GetInstance()->GetTexture("Home_Button.png"), SDL_FLIP_NONE);
+	backToHome->SetSize(70, 70);
+	backToHome->Set2DPosition((SCREEN_WIDTH - backToHome->GetWidth()) / 2, Winer->Get2DPosition().y + Winer->GetHeight() + 10);
+	backToHome->SetOnClick([this]() {
+		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_MENU);
+		});
+//Camera::GetInstance()->SetTarget(m_player);
 
 	m_KeyPress = 0;
 }
@@ -217,6 +244,10 @@ void GSPlay::HandleTouchEvents(SDL_Event& e, bool bIsPressed)
 			break;
 		}
 	}
+	if (isGameOver)
+	{
+		backToHome->HandleTouchEvent(&e);
+	}
 }
 
 void GSPlay::HandleMouseMoveEvents(int x, int y)
@@ -225,224 +256,227 @@ void GSPlay::HandleMouseMoveEvents(int x, int y)
 
 void GSPlay::Update(float deltaTime)
 {
-	//Update Button
-	for (auto& it : m_listButton)
+	if (!isGameOver)
 	{
-		it->Update(deltaTime);
-	}
-
-	//Update Player
-		//Move player
-	switch (m_KeyPress)
-	{
-	case 1: // Move left
-		m_player->MoveLeft(deltaTime);
-		break;
-	case 2: // Move down
-		m_player->MoveDown(deltaTime);
-		break;
-	case 4: // Move right
-		m_player->MoveRight(deltaTime);
-		break;
-	case 8: // Move up
-		m_player->MoveUp(deltaTime);
-		break;
-	default:
-		break;
-	}
-	//PlayerRotation
-	m_player->Update(deltaTime);
-	for (auto& it : m_listAnimation) {
-		it->Set2DPosition(m_player->Get2DPosition().x, m_player->Get2DPosition().y);
-		it->Update(deltaTime);
-	}
-	m_player = m_listAnimation[currentAngleIndex];
-
-	//Spawn enemy each 5s
-	spawnTime += deltaTime;
-	int value;
-	if (spawnTime > timeToSpawn)
-	{
-		//Random chose enemy
-		for (int i = 0; i < 4; ++i)
+		//Update Button
+		for (auto& it : m_listButton)
 		{
-			float x, y;
-			value = rand() % 4;
-			ENEMIES enemy = static_cast<ENEMIES>(value);
-			switch (enemy)
-			{
-			case Enemy1:
-				m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 1, 8, 3, 0.5f);
-				break;
-			case Enemy2:
-				m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 2, 8, 3, 0.5f);
-				break;
-			case Enemy3:
-				m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.5f);
-				break;
-			case Enemy4:
-				m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.5f);
-				break;
-			default:
-				break;
-			}
-			int side = rand() % 4; // Chọn ngẫu nhiên 1 trong 4 cạnh của màn hình
-			switch (side)
-			{
-			case 0: // Cạnh trên
-				x = rand() % SCREEN_WIDTH; // Chọn ngẫu nhiên hoành độ từ 0 đến SCREEN_WIDTH
-				y = 0; // Đặt tung độ bằng âm chiều cao của enemy
-				break;
-			case 1: // Cạnh phải
-				x = SCREEN_WIDTH; // Đặt hoành độ bằng chiều rộng của màn hình
-				y = rand() % SCREEN_HEIGHT; // Chọn ngẫu nhiên tung độ từ 0 đến SCREEN_HEIGHT
-				break;
-			case 2: // Cạnh dưới
-				x = rand() % SCREEN_WIDTH; // Chọn ngẫu nhiên hoành độ từ 0 đến SCREEN_WIDTH
-				y = SCREEN_HEIGHT; // Đặt tung độ bằng chiều cao của màn hình
-				break;
-			case 3: // Cạnh trái
-				x = 0; // Đặt hoành độ bằng âm chiều rộng của enemy
-				y = rand() % SCREEN_HEIGHT; // Chọn ngẫu nhiên tung độ từ 0 đến SCREEN_HEIGHT
-				break;
-			}
-			m_enemy->SetSize(50, 50);
-			m_enemy->Set2DPosition(x, y);
-			m_enemy->SetEnemyAlive(true);
-			m_listEnemy.push_back(m_enemy);
+			it->Update(deltaTime);
 		}
-		spawnTime = 0.0f;
-	}
 
-	//Update Enemy
-	for (auto& it : m_listEnemy)
-	{
-		// Get the enemy position and size
-		float ex = it->Get2DPosition().x;
-		float ey = it->Get2DPosition().y;
-		float ew = it->GetWidth();
-		float eh = it->GetHeight();
-
-		//Move to Player
-		GSPlay::EnemyAutoMove(it);
-		it->SetFlip(ex - m_player->Get2DPosition().x > 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
-
-		// check collision with bullet
-		if (it->GetEnemyAlive()) //if enemy alive
+		//Update Player
+			//Move player
+		switch (m_KeyPress)
 		{
-			for (auto& bul : m_listBullet)
+		case 1: // Move left
+			m_player->MoveLeft(deltaTime);
+			break;
+		case 2: // Move down
+			m_player->MoveDown(deltaTime);
+			break;
+		case 4: // Move right
+			m_player->MoveRight(deltaTime);
+			break;
+		case 8: // Move up
+			m_player->MoveUp(deltaTime);
+			break;
+		default:
+			break;
+		}
+		//PlayerRotation
+		m_player->Update(deltaTime);
+		for (auto& it : m_listAnimation) {
+			it->Set2DPosition(m_player->Get2DPosition().x, m_player->Get2DPosition().y);
+			it->Update(deltaTime);
+		}
+		m_player = m_listAnimation[currentAngleIndex];
+
+		//Spawn enemy each 5s
+		spawnTime += deltaTime;
+		int value;
+		if (spawnTime > timeToSpawn)
+		{
+			//Random chose enemy
+			for (int i = 0; i < 4; ++i)
 			{
-				float xb = bul->Get2DPosition().x;
-				float yb = bul->Get2DPosition().y;
-				float wb = bul->GetWidth();
-				float hb = bul->GetHeight();
-				//check VAR
-				if (checkVAR(xb, yb, wb, hb, ex, ey, ew, eh))
+				float x, y;
+				value = rand() % 4;
+				ENEMIES enemy = static_cast<ENEMIES>(value);
+				switch (enemy)
 				{
-					bul->SetActive(false);
-					it->SetEnemyAlive(false);
+				case Enemy1:
+					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 1, 8, 3, 0.125f);
+					break;
+				case Enemy2:
+					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 2, 8, 3, 0.125f);
+					break;
+				case Enemy3:
+					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.125f);
+					break;
+				case Enemy4:
+					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.125f);
+					break;
+				default:
 					break;
 				}
+				int side = rand() % 4; // Chọn ngẫu nhiên 1 trong 4 cạnh của màn hình
+				switch (side)
+				{
+				case 0: // Cạnh trên
+					x = rand() % SCREEN_WIDTH; // Chọn ngẫu nhiên hoành độ từ 0 đến SCREEN_WIDTH
+					y = 0; // Đặt tung độ bằng âm chiều cao của enemy
+					break;
+				case 1: // Cạnh phải
+					x = SCREEN_WIDTH; // Đặt hoành độ bằng chiều rộng của màn hình
+					y = rand() % SCREEN_HEIGHT; // Chọn ngẫu nhiên tung độ từ 0 đến SCREEN_HEIGHT
+					break;
+				case 2: // Cạnh dưới
+					x = rand() % SCREEN_WIDTH; // Chọn ngẫu nhiên hoành độ từ 0 đến SCREEN_WIDTH
+					y = SCREEN_HEIGHT; // Đặt tung độ bằng chiều cao của màn hình
+					break;
+				case 3: // Cạnh trái
+					x = 0; // Đặt hoành độ bằng âm chiều rộng của enemy
+					y = rand() % SCREEN_HEIGHT; // Chọn ngẫu nhiên tung độ từ 0 đến SCREEN_HEIGHT
+					break;
+				}
+				m_enemy->SetSize(50, 50);
+				m_enemy->Set2DPosition(x, y);
+				m_enemy->SetEnemyAlive(true);
+				m_listEnemy.push_back(m_enemy);
 			}
+			spawnTime = 0.0f;
 		}
 
-		// outside window
-		if (ex + ew < 0 || ex > SCREEN_WIDTH || ey + eh < 0 || ey > SCREEN_HEIGHT)
+		//Update Enemy
+		for (auto& it : m_listEnemy)
 		{
-			it->SetEnemyAlive(false);
-		}
+			// Get the enemy position and size
+			float ex = it->Get2DPosition().x;
+			float ey = it->Get2DPosition().y;
+			float ew = it->GetWidth();
+			float eh = it->GetHeight();
 
-		it->Update(deltaTime);
-	}
+			// Get player position and size
+			float px = m_player->Get2DPosition().x;
+			float py = m_player->Get2DPosition().y;
+			float pw = m_player->GetWidth();
+			float ph = m_player->GetHeight();
+			//Move to Player
+			GSPlay::EnemyAutoMove(it);
+			it->SetFlip(ex - px > 0 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
-	//Update Gun
-	float x = m_player->Get2DPosition().x,
-		y = m_player->Get2DPosition().y,
-		w = m_player->GetWidth(),
-		h = m_player->GetHeight();
-	//Hand Posision
-	double handX = x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
-	double handY = y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
-	//Pick Gun
-	/*if (checkVAR(x, y, w, h, m_gun1->Get2DPosition().x, m_gun1->Get2DPosition().y, m_gun1->GetWidth(), m_gun1->GetHeight()))
-	{
-		m_gun1->SetPicked(true);
-		m_gun2->SetPicked(false);
-		m_gun3->SetPicked(false);
-	}
-	if (checkVAR(x, y, w, h, m_gun2->Get2DPosition().x, m_gun2->Get2DPosition().y, m_gun2->GetWidth(), m_gun2->GetHeight()))
-	{
-		m_gun1->SetPicked(false);
-		m_gun2->SetPicked(false);
-		m_gun3->SetPicked(true);
-	}*/
-	//Pick gun done
-	m_gun->SetRotation(gunAngle);
-	//Set Gun on Hand
-	m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY - m_gun->GetHeight() / 2);
-
-	//Update BUllet
-	for (auto& it : m_listBullet) {
-
-		if (it->GetActive())
-		{
-			float x = it->Get2DPosition().x;
-			float y = it->Get2DPosition().y;
-			float r = it->GetRotation();
-			x += 20 * cos(r * M_PI / 180);
-			y += 20 * sin(r * M_PI / 180);
-
-			// Set the new bullet position
-			it->Set2DPosition(x, y);
-
-			// Collision with screen
-			if (x < 0 || x > SCREEN_WIDTH || y < 0 || y > SCREEN_HEIGHT)
+			// check collision with bullet and player
+			if (it->GetEnemyAlive()) //if enemy alive
 			{
-				it->SetActive(false);
+				//collision with bullet
+				for (auto& bul : m_listBullet)
+				{
+					float xb = bul->Get2DPosition().x;
+					float yb = bul->Get2DPosition().y;
+					float wb = bul->GetWidth();
+					float hb = bul->GetHeight();
+					//check VAR
+					if (checkVAR(xb, yb, wb, hb, ex, ey, ew, eh))
+					{
+						bul->SetActive(false);
+						it->SetEnemyAlive(false);
+						scores += 10;
+						score->LoadFromRenderText(std::to_string(scores));
+						break;
+					}
+				}
+				//coliision with player
+				if (checkVAR(px, py, pw, ph, ex, ey, ew, eh))
+				{
+					heart_nums--;
+					it->SetEnemyAlive(false);
+				}
 			}
+
+			// outside window
+			if (ex + ew < 0 || ex > SCREEN_WIDTH || ey + eh < 0 || ey > SCREEN_HEIGHT)
+			{
+				it->SetEnemyAlive(false);
+			}
+
+			it->Update(deltaTime);
 		}
-		it->Update(deltaTime);
-	}
 
-	currentTime = SDL_GetTicks();
-	elapsedTime = currentTime - startTime;
+		//Update Gun
+		//Hand Posision
+		double handX = m_player->Get2DPosition().x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
+		double handY = m_player->Get2DPosition().y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
+		m_gun->SetRotation(gunAngle);
+		//Set Gun on Hand
+		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY - m_gun->GetHeight() / 2);
 
-	if (elapsedTime >= 1000)
-	{
-		if (countdown <= 1)
+		//Update BUllet
+		for (auto& it : m_listBullet) {
+
+			if (it->GetActive())
+			{
+				float x = it->Get2DPosition().x;
+				float y = it->Get2DPosition().y;
+				float r = it->GetRotation();
+				x += 20 * cos(r * M_PI / 180);
+				y += 20 * sin(r * M_PI / 180);
+
+				// Set the new bullet position
+				it->Set2DPosition(x, y);
+
+				// Collision with screen
+				if (x < 0 || x > SCREEN_WIDTH || y < 0 || y > SCREEN_HEIGHT)
+				{
+					it->SetActive(false);
+				}
+			}
+			it->Update(deltaTime);
+		}
+
+		currentTime = SDL_GetTicks();
+		elapsedTime = currentTime - startTime;
+
+		if (elapsedTime >= 1000)
 		{
-			countdown = 1;
+			if (countdown <= 1)
+			{
+				countdown = 1;
+			}
+			countdown--;
+			startTime = currentTime;
 		}
-		countdown--;
-		startTime = currentTime;
+
+		int minutes = countdown / 60;
+		int seconds = countdown % 60;
+
+		min = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
+		min->SetSize(50, 40);
+		min->Set2DPosition(25, 30);
+		min->LoadFromRenderText(std::to_string(minutes) + " : ");
+
+		sec = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
+		sec->SetSize(50, 40);
+		sec->Set2DPosition(min->Get2DPosition().x + min->GetWidth() + 5, 30);
+		seconds < 10 ? sec->LoadFromRenderText("0 " + std::to_string(seconds))
+			: sec->LoadFromRenderText(std::to_string(seconds));
+
+
+		if (minutes < 1 && seconds < 1) {
+			/*if (scores > bestScore)
+				bestScore = scores;
+			GSPlay::WriteHighScore();*/
+			isGameOver = true;
+		}
+		if (heart_nums < 1 && seconds > 1)
+		{
+			isGameOver = true;
+		}
+		//Update position of camera
+		//Camera::GetInstance()->Update(deltaTime);
 	}
-
-	int minutes = countdown / 60;
-	int seconds = countdown % 60;
-
-	BLACK = { 0, 0, 0 };
-
-	min = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK , 14);
-	min->SetSize(40, 50);
-	min->Set2DPosition(25, 37);
-	min->LoadFromRenderText(std::to_string(minutes) + " : ");
-
-	sec = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
-	sec->SetSize(40,50);
-	sec->Set2DPosition(min->Get2DPosition().x + min->GetWidth() + 5, 37);
-	seconds < 10 ? sec->LoadFromRenderText("0 " + std::to_string(seconds)) 
-				 : sec->LoadFromRenderText(std::to_string(seconds));
-
-
-	/*if (minutes < 1 && seconds < 1) {
-		if (scores > bestScore)
-			bestScore = scores;
-		GSPlay::WriteHighScore();
-		isGameOver = true;
-	}*/
-	//Update position of camera
-	//Camera::GetInstance()->Update(deltaTime);
+	Winer->Update(deltaTime);
 }
+
 void GSPlay::drawRect(SDL_Renderer* renderer)
 {
 	SDL_Rect hitboxRect;
@@ -464,12 +498,14 @@ void GSPlay::drawEnemyRect(SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 	SDL_RenderDrawRect(renderer, &enemyRect);
 }
+
 void GSPlay::Draw(SDL_Renderer* renderer)
 {
 	m_background->Draw(renderer);
 	min->Draw(renderer);
 	sec->Draw(renderer);
-	//m_score->Draw();
+	m_score->Draw(renderer);
+	score->Draw(renderer);
 	for (auto& it : m_listButton)
 	{
 		it->Draw(renderer);
@@ -483,12 +519,13 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 			drawRect(renderer);
 		}
 	}
-	//Draw gun
-	/*for (auto& it : m_listGun)
+
+	//Draw hearth
+	for (int i = 0 ; i < heart_nums; ++i)
 	{
-		if (it->GetPicked())
-			it->Draw(renderer);
-	}*/
+		listHearthIcon[i]->Draw(renderer);
+	}
+	//Draw gun
 	m_gun->Draw(renderer);
 	//Draw bullet
 	for (auto& it : m_listBullet)
@@ -496,7 +533,6 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 		if (it->GetActive())
 			it->Draw(renderer);
 	}
-
 	//Draw enemy
 	for (auto& it : m_listEnemy)
 	{
@@ -505,6 +541,11 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 			it->Draw(renderer);
 			drawEnemyRect(renderer);
 		}
+	}
+	if (isGameOver)
+	{
+		heart_nums < 1 ? Loser->Draw(renderer) : Winer->Draw(renderer);
+		backToHome->Draw(renderer);
 	}
 }
 

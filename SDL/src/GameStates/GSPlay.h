@@ -23,35 +23,37 @@ public:
 
 	void	Init() override;
 	void	Exit() override;
-
 	void	Pause() override;
 	void	Resume() override;
-
 	void	HandleEvents() override;
 	void	HandleKeyEvents(SDL_Event& e) override;
 	void	HandleTouchEvents(SDL_Event& e, bool bIsPressed) override;
 	void	HandleMouseMoveEvents(int x, int y) override;
 	void	Update(float deltaTime) override;
-	void drawRect(SDL_Renderer* renderer);
-	void drawEnemyRect(SDL_Renderer* renderer);
 	void	Draw(SDL_Renderer* renderer) override;
-//	void	MovePlayer(float dx, float dy);
 
-	void EnemyAutoMove(std::shared_ptr<Enemy> e);
+
+	void	drawRect(SDL_Renderer* renderer);
+	void	drawEnemyRect(SDL_Renderer* renderer);
+	void	EnemyAutoMove(std::shared_ptr<Enemy> e);
+
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
 	//Time countdown
 	Uint32 startTime = SDL_GetTicks();
 	Uint32 currentTime, elapsedTime;
-	int countdown = 2 * 60;
-	SDL_Color BLACK;
-	int m_KeyPress;
+	int countdown = 1 * 60;
+	SDL_Color BLACK = { 0, 0, 0 };
+	
+	//Spawn Enemy
 	float spawnTime = timeToSpawn;
 	bool isGameOver = false;
+
+	int heart_nums = 3;
+	int m_KeyPress;
 private:
 	std::shared_ptr<Sprite2D>	m_background;
-	//std::shared_ptr<Text>		m_score;
 
 	//Button
 	std::list<std::shared_ptr<MouseButton>>	m_listButton;
@@ -60,7 +62,6 @@ private:
 	//player
 	std::shared_ptr<Player>					m_player;
 	std::shared_ptr<Player>					playerRotation;
-	std::shared_ptr<Player>					m_currentAnimation;
 	std::vector<std::shared_ptr<Player>>	m_listAnimation;
 
 	//Enemy
@@ -70,7 +71,7 @@ private:
 	//Gun
 	std::shared_ptr<Gun> m_gun;
 	std::list<std::shared_ptr<Gun>> m_listGun;
-
+	
 	//Bullet
 	std::shared_ptr<Bullet> m_bullet;
 	std::list<std::shared_ptr<Bullet>> m_listBullet;
@@ -79,7 +80,20 @@ private:
 	std::shared_ptr<Text>		min;
 	std::shared_ptr<Text>		sec;
 
-	float time = 0.0f;
+	// Score
+	std::shared_ptr<Text>		m_score;
+	std::shared_ptr<Text>		score;
+	int scores = 0;
+
+	//Heart
+	std::shared_ptr<Sprite2D> heartIcon;
+	std::vector<std::shared_ptr<Sprite2D>> listHearthIcon;
+
+	//Win or Lose
+	std::shared_ptr<SpriteAnimation> Winer;
+	std::shared_ptr<Sprite2D> Loser;
+	std::shared_ptr<MouseButton> backToHome;
+
 	float m_shootDelay = 20;
 	float m_lastShoot = 0.0;
 	float gunAngle = 0.0;
