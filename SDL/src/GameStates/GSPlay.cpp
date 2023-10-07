@@ -33,11 +33,9 @@ GSPlay::GSPlay()
 {
 }
 
-
 GSPlay::~GSPlay()
 {
 }
-
 
 void GSPlay::Init()
 {
@@ -433,43 +431,35 @@ void GSPlay::Update(float deltaTime)
 			it->Update(deltaTime);
 		}
 
+		//Time
 		currentTime = SDL_GetTicks();
 		elapsedTime = currentTime - startTime;
-
 		if (elapsedTime >= 1000)
 		{
-			if (countdown <= 1)
-			{
-				countdown = 1;
-			}
-			countdown--;
+			countdown = countdown <= 1 ? 1 : countdown - 1;
 			startTime = currentTime;
 		}
-
+		//Min
 		int minutes = countdown / 60;
-		int seconds = countdown % 60;
-
 		min = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
 		min->SetSize(50, 40);
 		min->Set2DPosition(25, 30);
 		min->LoadFromRenderText(std::to_string(minutes) + " : ");
 
+		//Sec
+		int seconds = countdown % 60;
 		sec = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
 		sec->SetSize(50, 40);
 		sec->Set2DPosition(min->Get2DPosition().x + min->GetWidth() + 5, 30);
 		seconds < 10 ? sec->LoadFromRenderText("0 " + std::to_string(seconds))
 			: sec->LoadFromRenderText(std::to_string(seconds));
 
-
-		if (minutes < 1 && seconds < 1) {
-			/*if (scores > bestScore)
-				bestScore = scores;
-			GSPlay::WriteHighScore();*/
-			isGameOver = true;
-		}
-		if (heart_nums < 1 && seconds > 1)
+		//Check GameOver
+		isGameOver = (minutes < 1 && seconds < 1) || (heart_nums < 1 && seconds > 1);
+		if (isGameOver)
 		{
-			isGameOver = true;
+			bestScore = std::max(scores, bestScore);
+			GSPlay::GetBestScore(bestScore);
 		}
 		//Update position of camera
 		//Camera::GetInstance()->Update(deltaTime);
@@ -568,6 +558,19 @@ void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
 		e->Set2DPosition(a, b);
 		dist = distance(m_player->Get2DPosition().x, m_player->Get2DPosition().y, a, b);
 	}
+}
+
+void GSPlay::GetBestScore(int highScore)
+{
+	
+	FILE* file = NULL;
+	fopen_s(&file, "Data/bestScore.txt", "w");
+	if (file == nullptr)
+	{
+		return;
+	}
+	fprintf(file, "%d", highScore);
+	fclose(file);
 }
 
 int GSPlay::getAngleIndex(double gunAngle, int numAngles, double angleSteps)

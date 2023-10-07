@@ -36,6 +36,7 @@ public:
 	void	drawRect(SDL_Renderer* renderer);
 	void	drawEnemyRect(SDL_Renderer* renderer);
 	void	EnemyAutoMove(std::shared_ptr<Enemy> e);
+	void	GetBestScore(int highScore);
 
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
@@ -52,6 +53,7 @@ public:
 
 	int heart_nums = 3;
 	int m_KeyPress;
+	int bestScore = 0;
 private:
 	std::shared_ptr<Sprite2D>	m_background;
 
