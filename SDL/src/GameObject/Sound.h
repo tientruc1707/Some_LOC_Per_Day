@@ -16,5 +16,4 @@ public:
 private:
 	std::string m_PathMusic;
 	Mix_Music* m_Music = NULL;
-	
 };

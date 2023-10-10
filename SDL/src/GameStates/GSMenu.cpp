@@ -10,7 +10,7 @@ GSMenu::~GSMenu()
 {
 }
 
-
+bool isSound = true;
 
 void GSMenu::Init()
 {
@@ -42,42 +42,56 @@ void GSMenu::Init()
 		});
 	m_listButton.push_back(honorButton);
 
-	//// exit button
-	//texture = ResourceManagers::GetInstance()->GetTexture("Next_Button.png");
-	//exitButton = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
-	//exitButton->SetSize(50, 50);
-	//exitButton->Set2DPosition(SCREEN_WIDTH - exitButton->GetWidth(), 10);
-	//exitButton->SetOnClick([]() {
-	//	exit(0);
-	//	});
-	//m_listButton.push_back(exitButton);
+	texture = ResourceManagers::GetInstance()->GetTexture("information.png");
+	inforButton = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
+	inforButton->Set2DPosition(SCREEN_WIDTH * 2 / 3, 420);
+	inforButton->SetSize(100, 100);
+	inforButton->SetOnClick([this] {
+		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_INFOR);
+		});
+	m_listButton.push_back(inforButton);
 
 	// game title
-	///Set Font
 	m_textColor = { 255, 255, 0 };
 	m_textGameName = std::make_shared<Text>("Data/NotJamChunkySans.ttf", m_textColor, 28);
 	m_textGameName->SetSize(500, 75);
-	m_textGameName->Set2DPosition((SCREEN_WIDTH - m_textGameName->GetWidth())/2, SCREEN_HEIGHT / 7 );
+	m_textGameName->Set2DPosition((SCREEN_WIDTH - m_textGameName->GetWidth()) / 2, SCREEN_HEIGHT / 7);
 	m_textGameName->LoadFromRenderText("Monster Attack");
-	//m_Sound = std::make_shared<Sound>("Data/Sounds/Still_Want_It.mp3");
-	//m_Sound->PlaySound();
+
+	//sound
+	m_Sound = std::make_shared<Sound>("Data/Sounds/Still_Want_It.mp3");
+	m_Sound->PlaySound();
+
+	texture = ResourceManagers::GetInstance()->GetTexture("Music_On.png");
+	musicOnButton = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
+	musicOnButton->Set2DPosition(50, 50);
+	musicOnButton->SetSize(75, 75);
+	musicOnButton->SetOnClick([this] {
+		m_Sound->PauseSound();
+		isSound = false;
+		});
+	texture = ResourceManagers::GetInstance()->GetTexture("Music_Off.png");
+	musicOffButton = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
+	musicOffButton->Set2DPosition(50, 50);
+	musicOffButton->SetSize(75, 75);
+	musicOffButton->SetOnClick([this] {
+		m_Sound->ResumeSound();
+		isSound = true;
+		});
 }
 
 void GSMenu::Exit()
 {
-	ResourceManagers::FreeInstance();
+	//ResourceManagers::FreeInstance();
 }
 
 
 void GSMenu::Pause()
 {
-	//m_Sound->StopSound();
-
 }
 
 void GSMenu::Resume()
 {
-	//m_Sound->PlaySound();
 }
 
 
@@ -98,6 +112,7 @@ void GSMenu::HandleTouchEvents(SDL_Event& e, bool bIsPressed)
 			break;
 		}
 	}
+	isSound ? musicOnButton->HandleTouchEvent(&e) : musicOffButton->HandleTouchEvent(&e);
 }
 
 void GSMenu::HandleMouseMoveEvents(int x, int y)
@@ -112,11 +127,12 @@ void GSMenu::Update(float deltaTime)
 	{
 		time = 0.0f;
 	}
-	m_background->Update(deltaTime);
 	for (auto& it : m_listButton)
 	{
 		it->Update(deltaTime);
 	}
+	musicOnButton->Update(deltaTime);
+	musicOffButton->Update(deltaTime);
 }
 
 void GSMenu::Draw(SDL_Renderer* renderer)
@@ -127,4 +143,5 @@ void GSMenu::Draw(SDL_Renderer* renderer)
 		it->Draw(renderer);
 	}
 	m_textGameName->Draw(renderer);
+	isSound ? musicOnButton->Draw(renderer) : musicOffButton->Draw(renderer);
 }

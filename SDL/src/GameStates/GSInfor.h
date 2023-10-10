@@ -20,5 +20,7 @@ public:
 	void	Update(float deltaTime) override;
 	void	Draw(SDL_Renderer* renderer) override;
 private:
-
+	std::shared_ptr<Sprite2D> bgr;
+	std::shared_ptr<MouseButton> quitButton;
+	std::shared_ptr<Text> credit;
 };

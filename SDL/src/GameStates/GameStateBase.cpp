@@ -32,10 +32,10 @@ std::shared_ptr<GameStateBase> GameStateBase::CreateState(StateType stt)
 		gs = std::make_shared<GSPause>();
 		//GSPAUSE
 		break;
-	//case StateType::STATE_INFOR:
-	//	gs = std::make_shared<GSInfor>();
-	//	//GSINFOR
-	//	break;
+	case StateType::STATE_INFOR:
+		gs = std::make_shared<GSInfor>();
+		//GSINFOR
+		break;
 	case StateType::STATE_HONOR:
 		gs = std::make_shared<GSHonor>();
 		//GSHONOR
