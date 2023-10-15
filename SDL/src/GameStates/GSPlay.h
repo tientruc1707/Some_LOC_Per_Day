@@ -14,8 +14,7 @@ enum GUNS {Piston, M249, Soc_Lo};
 class Sprite2D;
 class SpriteAnimation;
 
-class GSPlay :
-	public GameStateBase
+class GSPlay : public GameStateBase
 {
 public:
 	GSPlay();
@@ -41,19 +40,6 @@ public:
 	//Lấy chỉ số của hướng xxoay
 	int getAngleIndex(double gunAngle, int numAngles, double angleSteps);
 
-	//Time countdown
-	Uint32 startTime = SDL_GetTicks();
-	Uint32 currentTime, elapsedTime;
-	int countdown = 1 * 60;
-	SDL_Color BLACK = { 0, 0, 0 };
-	
-	//Spawn Enemy
-	float spawnTime = timeToSpawn;
-	bool isGameOver = false;
-
-	int heart_nums = 3;
-	int m_KeyPress;
-	int bestScore = 0;
 private:
 	std::shared_ptr<Sprite2D>	m_background;
 
@@ -106,5 +92,18 @@ private:
 	double angleSteps = 360.0 / numAngle;
 	//hướng quay được chọn
 	int currentAngleIndex = 0;
+	//Time countdown
+	Uint32 startTime = SDL_GetTicks();
+	Uint32 currentTime, elapsedTime;
+	int countdown = 1 * 60;
+	SDL_Color BLACK = { 0, 0, 0 };
+
+	//Spawn Enemy
+	float spawnTime = timeToSpawn;
+	bool isGameOver = false;
+
+	int heart_nums = 3;
+	int m_KeyPress;
+	int bestScore = 0;
 };
 

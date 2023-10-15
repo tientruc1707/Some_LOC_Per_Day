@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseObject.h"
+#include "GameStateBase.h"
 
 class Enemy : BaseObject
 {
@@ -11,22 +12,20 @@ public:
 	void		Update(float deltatime) override;
 
 	void		Set2DPosition(float x, float y);
-	void		SetRotation(double angle);
 	void		SetFlip(SDL_RendererFlip flip);
-
 	Vector2		Get2DPosition();
 	void		SetSize(int width, int height);
 	int			GetWidth();
 	int			GetHeight();
-//	void		Move(float deltaTime);
 
 	void		SetEnemyAlive(bool Alive);
 	bool		GetEnemyAlive();
+
+	std::shared_ptr<Sprite2D> deathEnemy;
 protected:
 	Vector2			m_Vec2DPos;
 	int			m_iHeight;
 	int			m_iWidth;
-	float			m_numFrames;
 	int			m_currentFrame;
 	float		m_frameTime;
 	float		m_currentTime;
@@ -34,8 +33,6 @@ protected:
 	int		m_frameCount; // start from 1,2,3...
 	float  m_currentTicks;
 	Uint32 m_lastUpdate;
-	int			m_animSpeed;
 	int m_numAction;
-
 	bool Alive = true;
 };

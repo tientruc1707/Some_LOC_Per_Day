@@ -94,7 +94,7 @@ void GSPlay::Init()
 	for (int i = 0; i < 20; ++i)
 	{
 		m_bullet = std::make_shared<Bullet>(ResourceManagers::GetInstance()->GetTexture("bullet.png"), SDL_FLIP_NONE);
-		m_bullet->SetSize(20, 20);
+		m_bullet->SetSize(12, 12);
 		m_bullet->SetActive(false);
 		m_listBullet.push_back(m_bullet);
 	}
@@ -106,8 +106,8 @@ void GSPlay::Init()
 		//m_listGun.push_back(m_gun2);
 
 		//M249
-	m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"), SDL_FLIP_NONE);
-	m_gun->SetSize(60, 40);
+	m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR3.png"), SDL_FLIP_NONE);
+	m_gun->SetSize(40,20);
 	m_gun->SetPicked(false);
 	//m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
 	m_listGun.push_back(m_gun);
@@ -131,15 +131,12 @@ void GSPlay::Init()
 		heartIcon->Set2DPosition(x, 80);
 		listHearthIcon.push_back(heartIcon);
 	}
-	//Winer
 	Winer = std::make_shared<SpriteAnimation>(ResourceManagers::GetInstance()->GetTexture("victory.jpg"), 2, 5, 4, 0.2f);
 	Winer->SetSize(300, 300);
 	Winer->Set2DPosition((SCREEN_WIDTH - Winer->GetWidth()) / 2, (SCREEN_HEIGHT - Winer->GetHeight()) / 2);
-
 	Loser = std::make_shared<Sprite2D>(ResourceManagers::GetInstance()->GetTexture("Lose.jpg"), SDL_FLIP_NONE);
 	Loser->SetSize(500, 300);
 	Loser->Set2DPosition((SCREEN_WIDTH - Loser->GetWidth()) / 2, (SCREEN_HEIGHT - Loser->GetHeight()) / 2);
-
 	backToHome = std::make_shared<MouseButton>(ResourceManagers::GetInstance()->GetTexture("Home_Button.png"), SDL_FLIP_NONE);
 	backToHome->SetSize(70, 70);
 	backToHome->Set2DPosition((SCREEN_WIDTH - backToHome->GetWidth()) / 2, Winer->Get2DPosition().y + Winer->GetHeight() + 10);
@@ -416,14 +413,14 @@ void GSPlay::Update(float deltaTime)
 
 			it->Update(deltaTime);
 		}
-
 		//Update Gun
 		//Hand Posision
-		double handX = m_player->Get2DPosition().x + m_player->GetWidth() / 2+ cos(gunAngle * M_PI / 180) * 25;
-		double handY = m_player->Get2DPosition().y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
+		double handX = m_player->Get2DPosition().x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 12.5;
+		double handY = m_player->Get2DPosition().y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 12.5;
 		m_gun->SetRotation(gunAngle);
+		m_gun->SetFlip(gunAngle > 90 && gunAngle <= 270 ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
 		//Set Gun on Hand
-		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2 , handY - m_gun->GetHeight() / 2 );
+		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY );
 
 		//Update BUllet
 		for (auto& it : m_listBullet) {
@@ -453,7 +450,7 @@ void GSPlay::Update(float deltaTime)
 		elapsedTime = currentTime - startTime;
 		if (elapsedTime >= 1000)
 		{
-			countdown = countdown <= 1 ? 1 : countdown - 1;
+			countdown = (countdown <= 1) ? 1 : countdown - 1;
 			startTime = currentTime;
 		}
 		//Min
@@ -472,7 +469,7 @@ void GSPlay::Update(float deltaTime)
 			: sec->LoadFromRenderText(std::to_string(seconds));
 
 		//Check GameOver
-		isGameOver = (minutes < 1 && seconds < 1) || (heart_nums < 1 && seconds > 1);
+		isGameOver = (minutes < 1 && seconds < 1);// || (heart_nums < 1 && seconds > 1);
 		if (isGameOver)
 		{
 			bestScore = std::max(scores, bestScore);
@@ -547,6 +544,9 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 		{
 			it->Draw(renderer);
 			drawEnemyRect(renderer);
+		} 
+		else {
+			it->deathEnemy->Draw(renderer);
 		}
 	}
 	if (isGameOver)

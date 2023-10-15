@@ -8,9 +8,7 @@ Enemy::Enemy(std::shared_ptr<TextureManager> texture, int spriteRow, int frameCo
 	m_spriteRow = spriteRow;
 	m_frameCount = frameCount;
 	m_numAction = numAction;
-	//m_animSpeed = animSpeed;
 	m_frameTime = frameTime;
-	//m_flip = flip;
 	m_currentFrame = 0;
 	m_currentTicks = 0;
 	m_lastUpdate = SDL_GetTicks();
@@ -23,6 +21,9 @@ Enemy::~Enemy()
 
 void Enemy::Init()
 {
+	auto texture = ResourceManagers::GetInstance()->GetTexture("death.png");
+	deathEnemy = std::make_shared<Sprite2D>(texture, SDL_FLIP_NONE);
+	
 }
 
 void Enemy::Draw(SDL_Renderer* renderer)
@@ -43,16 +44,15 @@ void Enemy::Update(float deltatime)
 		}
 		m_currentTicks -= m_frameTime;
 	}
+	if (this->Alive) {
+		deathEnemy->Set2DPosition(this->Get2DPosition().x, this->Get2DPosition().y);
+		deathEnemy->SetSize(this->GetWidth(), this->GetHeight());
+	}
 }
 
 void Enemy::Set2DPosition(float x, float y)
 {
 	m_position = Vector3((float)x, (float)y, 0.0f);
-}
-
-void Enemy::SetRotation(double angle)
-{
-	m_angle = angle;
 }
 
 void Enemy::SetFlip(SDL_RendererFlip flip)
