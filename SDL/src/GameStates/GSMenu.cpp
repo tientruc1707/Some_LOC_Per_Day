@@ -29,7 +29,7 @@ void GSMenu::Init()
 	playButton->SetSize(100, 100);
 	playButton->Set2DPosition(SCREEN_WIDTH * 2 / 3, 180);
 	playButton->SetOnClick([]() {
-		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_PLAY);
+		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_SELECTTYPE);
 		});
 	m_listButton.push_back(playButton);
 

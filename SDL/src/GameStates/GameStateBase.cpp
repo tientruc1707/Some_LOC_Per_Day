@@ -5,6 +5,8 @@
 #include "GSPause.h"
 #include "GSInfor.h"
 #include "GSHonor.h"
+#include "GSSelectType.h"
+
 
 GameStateBase::GameStateBase(StateType stateType) : m_stateType(stateType)
 {}
@@ -39,6 +41,10 @@ std::shared_ptr<GameStateBase> GameStateBase::CreateState(StateType stt)
 	case StateType::STATE_HONOR:
 		gs = std::make_shared<GSHonor>();
 		//GSHONOR
+		break;
+	case StateType::STATE_SELECTTYPE:
+		gs = std::make_shared<GSSelectTpye>();
+		//GSSELECTTYPE
 		break;
 	default:
 		break;

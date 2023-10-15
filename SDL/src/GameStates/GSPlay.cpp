@@ -5,6 +5,9 @@
 #include "GameObject/SpriteAnimation.h"
 #include "GameObject/Camera.h"
 #include <GSMenu.h>
+#include "GSSelectType.h"
+
+extern int selectPlayer;
 
 //check VAR
 bool checkVAR(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
@@ -56,8 +59,22 @@ void GSPlay::Init()
 		});
 	m_listButton.push_back(button);
 
-	// Player and rotation
-	texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
+	// Pick Player
+	switch (selectPlayer)
+	{
+	case 1:
+		texture = ResourceManagers::GetInstance()->GetTexture("player1.png");
+		break;
+	case 2:
+		texture = ResourceManagers::GetInstance()->GetTexture("player2.png");
+		break;
+	case 3:
+		texture = ResourceManagers::GetInstance()->GetTexture("player3.png");
+		break;
+	default:
+		break;
+	}
+	//Player and Rotation
 	for (int i = 7; i >= 0; i--)
 	{
 		if (i == 7)
@@ -77,7 +94,7 @@ void GSPlay::Init()
 	for (int i = 0; i < 20; ++i)
 	{
 		m_bullet = std::make_shared<Bullet>(ResourceManagers::GetInstance()->GetTexture("bullet.png"), SDL_FLIP_NONE);
-		m_bullet->SetSize(10, 10);
+		m_bullet->SetSize(20, 20);
 		m_bullet->SetActive(false);
 		m_listBullet.push_back(m_bullet);
 	}
@@ -90,11 +107,11 @@ void GSPlay::Init()
 
 		//M249
 	m_gun = std::make_shared<Gun>(ResourceManagers::GetInstance()->GetTexture("weaponR1.png"), SDL_FLIP_NONE);
-	m_gun->SetSize(30, 20);
+	m_gun->SetSize(60, 40);
 	m_gun->SetPicked(false);
-	m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+	//m_gun->Set2DPosition(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
 	m_listGun.push_back(m_gun);
-	
+
 	//Score
 	m_score = std::make_shared<Text>("Data/NotJamChunkySans.ttf", BLACK, 14);
 	m_score->SetSize(110, 40);
@@ -120,16 +137,16 @@ void GSPlay::Init()
 	Winer->Set2DPosition((SCREEN_WIDTH - Winer->GetWidth()) / 2, (SCREEN_HEIGHT - Winer->GetHeight()) / 2);
 
 	Loser = std::make_shared<Sprite2D>(ResourceManagers::GetInstance()->GetTexture("Lose.jpg"), SDL_FLIP_NONE);
-	Loser->SetSize(500,300);
+	Loser->SetSize(500, 300);
 	Loser->Set2DPosition((SCREEN_WIDTH - Loser->GetWidth()) / 2, (SCREEN_HEIGHT - Loser->GetHeight()) / 2);
-	
+
 	backToHome = std::make_shared<MouseButton>(ResourceManagers::GetInstance()->GetTexture("Home_Button.png"), SDL_FLIP_NONE);
 	backToHome->SetSize(70, 70);
 	backToHome->Set2DPosition((SCREEN_WIDTH - backToHome->GetWidth()) / 2, Winer->Get2DPosition().y + Winer->GetHeight() + 10);
 	backToHome->SetOnClick([this]() {
 		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_MENU);
 		});
-//Camera::GetInstance()->SetTarget(m_player);
+	//Camera::GetInstance()->SetTarget(m_player);
 
 	m_KeyPress = 0;
 }
@@ -402,11 +419,11 @@ void GSPlay::Update(float deltaTime)
 
 		//Update Gun
 		//Hand Posision
-		double handX = m_player->Get2DPosition().x + m_player->GetWidth() / 2 + cos(gunAngle * M_PI / 180) * 25;
+		double handX = m_player->Get2DPosition().x + m_player->GetWidth() / 2+ cos(gunAngle * M_PI / 180) * 25;
 		double handY = m_player->Get2DPosition().y + m_player->GetHeight() / 2 + sin(gunAngle * M_PI / 180) * 25;
 		m_gun->SetRotation(gunAngle);
 		//Set Gun on Hand
-		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY - m_gun->GetHeight() / 2);
+		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2 , handY - m_gun->GetHeight() / 2 );
 
 		//Update BUllet
 		for (auto& it : m_listBullet) {

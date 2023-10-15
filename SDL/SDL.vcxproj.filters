@@ -99,6 +99,9 @@
     <ClCompile Include="src\GameStates\GSHonor.cpp">
       <Filter>Source Files\GameState</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameStates\GSSelectType.cpp">
+      <Filter>Source Files\GameState</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GameObject\BaseObject.h">
@@ -180,6 +183,9 @@
       <Filter>Source Files\GameState</Filter>
     </ClInclude>
     <ClInclude Include="src\GameStates\GSHonor.h">
+      <Filter>Source Files\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameStates\GSSelectType.h">
       <Filter>Source Files\GameState</Filter>
     </ClInclude>
   </ItemGroup>

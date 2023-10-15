@@ -16,7 +16,7 @@ void GSInfor::Init()
 
 	quitButton = std::make_shared<MouseButton>(ResourceManagers::GetInstance()->GetTexture("Next_Button.png"), SDL_FLIP_HORIZONTAL);
 	quitButton->Set2DPosition(30, 30);
-	quitButton->SetSize(75, 75);
+	quitButton->SetSize(50, 50);
 	quitButton->SetOnClick([this] {
 		GameStateMachine::GetInstance()->PopState();
 		});

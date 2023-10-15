@@ -26,7 +26,7 @@ void GSPause::Init()
 	pRestart->SetSize(50, 50);
 	pRestart->Set2DPosition(SCREEN_WIDTH / 4 - 25, SCREEN_HEIGHT / 2 - 25);
 	pRestart->SetOnClick([this]() {
-		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_PLAY);
+		GameStateMachine::GetInstance()->ChangeState(StateType::STATE_SELECTTYPE);
 		});
 	listOption.push_back(pRestart);
 
