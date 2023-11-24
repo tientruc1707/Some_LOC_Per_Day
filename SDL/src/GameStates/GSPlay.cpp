@@ -9,6 +9,13 @@
 
 extern int selectPlayer;
 
+//các biến để giảm sức khỏe và nhấp nháy trong thời gian không thể bị chỉ định
+bool isInvulnerable = false;
+bool isSpriteVisible = true;
+bool hasCollided = false;
+Uint32 resetInvulnerability(Uint32 interval, void* param);
+Uint32 toggleSpriteVisibility(Uint32 interval, void* param);
+
 //check VAR
 bool checkVAR(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
 	return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
@@ -48,7 +55,6 @@ void GSPlay::Init()
 	m_background = std::make_shared<Sprite2D>(texture, SDL_FLIP_NONE);
 	m_background->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	m_background->Set2DPosition(0, 0);
-
 	//button pause
 	texture = ResourceManagers::GetInstance()->GetTexture("Pause_Button.png");
 	button = std::make_shared<MouseButton>(texture, SDL_FLIP_NONE);
@@ -131,9 +137,12 @@ void GSPlay::Init()
 		heartIcon->Set2DPosition(x, 80);
 		listHearthIcon.push_back(heartIcon);
 	}
+
+	//Win Game
 	Winer = std::make_shared<SpriteAnimation>(ResourceManagers::GetInstance()->GetTexture("victory.jpg"), 2, 5, 4, 0.2f);
 	Winer->SetSize(300, 300);
 	Winer->Set2DPosition((SCREEN_WIDTH - Winer->GetWidth()) / 2, (SCREEN_HEIGHT - Winer->GetHeight()) / 2);
+	//Lose Game	
 	Loser = std::make_shared<Sprite2D>(ResourceManagers::GetInstance()->GetTexture("Lose.jpg"), SDL_FLIP_NONE);
 	Loser->SetSize(500, 300);
 	Loser->Set2DPosition((SCREEN_WIDTH - Loser->GetWidth()) / 2, (SCREEN_HEIGHT - Loser->GetHeight()) / 2);
@@ -309,10 +318,10 @@ void GSPlay::Update(float deltaTime)
 		if (spawnTime > timeToSpawn)
 		{
 			//Random chose enemy
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < 5; ++i)
 			{
 				float x, y;
-				value = rand() % 4;
+				value = rand() % 5;
 				ENEMIES enemy = static_cast<ENEMIES>(value);
 				switch (enemy)
 				{
@@ -322,13 +331,8 @@ void GSPlay::Update(float deltaTime)
 				case Enemy2:
 					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 2, 8, 3, 0.125f);
 					break;
-				case Enemy3:
-					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.125f);
-					break;
-				case Enemy4:
-					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.125f);
-					break;
 				default:
+					m_enemy = std::make_shared<Enemy>(ResourceManagers::GetInstance()->GetTexture("Enemy1-2-4.png"), 3, 8, 3, 0.125f);
 					break;
 				}
 				int side = rand() % 4; // Chọn ngẫu nhiên 1 trong 4 cạnh của màn hình
@@ -398,13 +402,21 @@ void GSPlay::Update(float deltaTime)
 					}
 				}
 				//coliision with player
-				if (checkVAR(px, py, pw, ph, ex, ey, ew, eh))
-				{
-					heart_nums--;
-					it->SetEnemyAlive(false);
+				if (checkVAR(px, py, pw, ph, ex + 11, ey + 10, ew - 22, eh - 20)) {
+					if (!isInvulnerable) {
+						heart_nums--;
+						// Chuyển sang ko thể bị chỉ định
+						isInvulnerable = true;
+						// thời gian ko thể bị chỉ định
+						int invulnerabilityCooldown = 3000;
+						SDL_AddTimer(invulnerabilityCooldown, resetInvulnerability, NULL);
+						// nhịp độ nhấp nahsy
+						int flashingInterval = 200; // Tốc độ nhấp nháy
+						SDL_AddTimer(flashingInterval, toggleSpriteVisibility, NULL);
+						hasCollided = true;
+					}
 				}
 			}
-
 			// outside window
 			if (ex + ew < 0 || ex > SCREEN_WIDTH || ey + eh < 0 || ey > SCREEN_HEIGHT)
 			{
@@ -422,7 +434,7 @@ void GSPlay::Update(float deltaTime)
 		//Set Gun on Hand
 		m_gun->Set2DPosition(handX - m_gun->GetWidth() / 2, handY );
 
-		//Update BUllet
+		//Update Bullet
 		for (auto& it : m_listBullet) {
 
 			if (it->GetActive())
@@ -444,13 +456,12 @@ void GSPlay::Update(float deltaTime)
 			}
 			it->Update(deltaTime);
 		}
-
 		//Time
 		currentTime = SDL_GetTicks();
 		elapsedTime = currentTime - startTime;
 		if (elapsedTime >= 1000)
 		{
-			countdown = (countdown <= 1) ? 1 : countdown - 1;
+			countdown = (countdown <= 10) ? 0 : countdown - 1;
 			startTime = currentTime;
 		}
 		//Min
@@ -469,7 +480,7 @@ void GSPlay::Update(float deltaTime)
 			: sec->LoadFromRenderText(std::to_string(seconds));
 
 		//Check GameOver
-		isGameOver = (minutes < 1 && seconds < 1);// || (heart_nums < 1 && seconds > 1);
+		isGameOver = (minutes < 1 && seconds < 1) || (heart_nums < 1 && seconds >= 1);
 		if (isGameOver)
 		{
 			bestScore = std::max(scores, bestScore);
@@ -481,28 +492,6 @@ void GSPlay::Update(float deltaTime)
 	Winer->Update(deltaTime);
 }
 
-void GSPlay::drawRect(SDL_Renderer* renderer)
-{
-	SDL_Rect hitboxRect;
-	hitboxRect.x = m_player->Get2DPosition().x;
-	hitboxRect.y = m_player->Get2DPosition().y;
-	hitboxRect.w = m_player->GetWidth();
-	hitboxRect.h = m_player->GetHeight();
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect(renderer, &hitboxRect);
-}
-
-void GSPlay::drawEnemyRect(SDL_Renderer* renderer)
-{
-	SDL_Rect enemyRect;
-	enemyRect.x = m_enemy->Get2DPosition().x;
-	enemyRect.y = m_enemy->Get2DPosition().y;
-	enemyRect.w = m_enemy->GetWidth();
-	enemyRect.h = m_enemy->GetHeight();
-	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	SDL_RenderDrawRect(renderer, &enemyRect);
-}
-
 void GSPlay::Draw(SDL_Renderer* renderer)
 {
 	m_background->Draw(renderer);
@@ -510,6 +499,7 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 	sec->Draw(renderer);
 	m_score->Draw(renderer);
 	score->Draw(renderer);
+	//Draw button
 	for (auto& it : m_listButton)
 	{
 		it->Draw(renderer);
@@ -519,11 +509,11 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 	{
 		if (it == m_player)
 		{
-			it->Draw(renderer);
-			drawRect(renderer);
+			if (isSpriteVisible) {
+				it->Draw(renderer);
+			}
 		}
 	}
-
 	//Draw hearth
 	for (int i = 0 ; i < heart_nums; ++i)
 	{
@@ -543,12 +533,12 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 		if (it->GetEnemyAlive())
 		{
 			it->Draw(renderer);
-			drawEnemyRect(renderer);
 		} 
 		else {
 			it->deathEnemy->Draw(renderer);
 		}
 	}
+	//GameOver
 	if (isGameOver)
 	{
 		heart_nums < 1 ? Loser->Draw(renderer) : Winer->Draw(renderer);
@@ -559,7 +549,7 @@ void GSPlay::Draw(SDL_Renderer* renderer)
 void GSPlay::EnemyAutoMove(std::shared_ptr<Enemy> e)
 {
 
-	int m_enemySpeed = 1 ;
+	int m_enemySpeed = rand() % 5;
 	//tinh go'c giua enemy vs palyer
 	float angle = atan2(m_player->Get2DPosition().y - e->Get2DPosition().y, m_player->Get2DPosition().x - e->Get2DPosition().x);
 	//tinh khoang cach
@@ -597,4 +587,27 @@ int GSPlay::getAngleIndex(double gunAngle, int numAngles, double angleSteps)
 	int roundedAngle = (int)round(gunAngle);
 	int angleIndex = (roundedAngle / (int)angleSteps) % numAngles;
 	return angleIndex;
+}
+
+Uint32 resetInvulnerability(Uint32 interval, void* param) {
+	isInvulnerable = false;
+	hasCollided = false;
+	if (!isInvulnerable) {
+		// Reset the sprite visibility to be visible
+		isSpriteVisible = true;
+		return 0;
+	}
+	return interval;
+}
+
+//Toggle sprite visibility to make flashing effect
+Uint32 toggleSpriteVisibility(Uint32 interval, void* param) {
+	if (isInvulnerable && hasCollided) {
+		isSpriteVisible = !isSpriteVisible;
+	}
+	if (isInvulnerable) {
+		return interval;
+	}
+	isSpriteVisible = true;
+	return 0;
 }
